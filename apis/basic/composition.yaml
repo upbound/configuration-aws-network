@@ -31,6 +31,11 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.parameters.region
           toFieldPath: spec.forProvider.region
+    - name: network-id-tags
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.id
+          toFieldPath: spec.forProvider.tags[networks.aws.platform.upbound.io/network-id]
   resources:
     - name: vpc
       base:
@@ -95,6 +100,8 @@ spec:
           patchSetName: network-id
         - type: PatchSet
           patchSetName: region
+        - type: PatchSet
+          patchSetName: network-id-tags
         - fromFieldPath: spec.parameters.region
           toFieldPath: spec.forProvider.availabilityZone
           transforms:
@@ -134,6 +141,8 @@ spec:
           patchSetName: network-id
         - type: PatchSet
           patchSetName: region
+        - type: PatchSet
+          patchSetName: network-id-tags
         - fromFieldPath: spec.parameters.region
           toFieldPath: spec.forProvider.availabilityZone
           transforms:
