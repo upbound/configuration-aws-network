@@ -26,6 +26,11 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.parameters.id
           toFieldPath: metadata.labels[networks.aws.platform.upbound.io/network-id]
+    - name: network-id-tags
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.id
+          toFieldPath: spec.forProvider.tags[networks.aws.platform.upbound.io/network-id]
     - name: region
       patches:
         - type: FromCompositeFieldPath
@@ -94,6 +99,8 @@ spec:
         - type: PatchSet
           patchSetName: network-id
         - type: PatchSet
+          patchSetName: network-id-tags
+        - type: PatchSet
           patchSetName: region
         - fromFieldPath: spec.parameters.region
           toFieldPath: spec.forProvider.availabilityZone
@@ -132,6 +139,8 @@ spec:
           patchSetName: deletionPolicy
         - type: PatchSet
           patchSetName: network-id
+        - type: PatchSet
+          patchSetName: network-id-tags
         - type: PatchSet
           patchSetName: region
         - fromFieldPath: spec.parameters.region
