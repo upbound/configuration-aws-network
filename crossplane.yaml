@@ -11,4 +11,4 @@ spec:
     version: ">=v1.13.2-0"
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-aws-ec2
-      version: ">=v0.42.0"
+      version: "v0.43.0"
