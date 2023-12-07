@@ -12,12 +12,12 @@ spec:
     kind: XNetwork
   mode: Pipeline
   pipeline:
-    - functionRef:
+    - step: patch-and-transform
+      functionRef:
         name: upbound-function-patch-and-transform
       input:
         apiVersion: pt.fn.crossplane.io/v1beta1
         kind: Resources
-        step: patch-and-transform
         patchSets:
           - name: providerConfigRef
             patches:
