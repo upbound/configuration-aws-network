@@ -72,4 +72,7 @@ uptest: $(UPTEST) $(KUBECTL) $(KUTTL)
 # - UPTEST_CLOUD_CREDENTIALS, cloud credentials for the provider being tested, e.g. export UPTEST_CLOUD_CREDENTIALS=$(cat ~/.aws/credentials)
 e2e: build controlplane.up local.xpkg.deploy.configuration.$(PROJECT_NAME) uptest
 
-.PHONY: uptest e2e
+render:
+	crossplane beta render examples/network-xr.yaml apis/basic/composition.yaml examples/function/function.yaml -r
+
+.PHONY: uptest e2e render
