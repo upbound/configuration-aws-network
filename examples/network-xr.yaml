@@ -6,3 +6,11 @@ spec:
   parameters:
     id: platform-ref-aws
     region: us-west-2
+status:
+  subnetIds:
+    - subnet-abc
+    - subnet-def
+    - subnet-ghi
+    - subnet-jkl
+  securityGroupIds:
+    - sg-abc
