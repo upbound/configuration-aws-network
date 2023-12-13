@@ -184,6 +184,9 @@ spec:
               - fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.subnetIds[1]
                 type: ToCompositeFieldPath
+              - fromFieldPath: status.test # bidirectional patch test render fails without the full XR mock
+                toFieldPath: spec.forProvider.tags[test]
+                type: FromCompositeFieldPath
 
           - name: subnetPrivateA
             base:
@@ -227,6 +230,7 @@ spec:
               - fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.subnetIds[2]
                 type: ToCompositeFieldPath
+
 
           - name: subnetPrivateB
             base:
