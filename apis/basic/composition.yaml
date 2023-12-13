@@ -231,7 +231,6 @@ spec:
                 toFieldPath: status.subnetIds[2]
                 type: ToCompositeFieldPath
 
-
           - name: subnetPrivateB
             base:
               apiVersion: ec2.aws.upbound.io/v1beta1

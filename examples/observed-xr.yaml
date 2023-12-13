@@ -1,0 +1,10 @@
+---
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: XNetwork
+metadata:
+  name: ref-aws-network
+status:
+  cidrBlock: 192.168.0.0/18
+  subnetIds:
+  - subnetPublicAextnameTest
+  test: subnet-id-test
