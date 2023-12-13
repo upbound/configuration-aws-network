@@ -516,3 +516,7 @@ spec:
                 type: PatchSet
               - patchSetName: region
                 type: PatchSet
+              - fromFieldPath: status.subnetIds[0]
+                toFieldPath: metadata.annotations[test.crossplane.io/subnetIds]
+                policy:
+                  fromFieldPath: Required
