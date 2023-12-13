@@ -73,6 +73,6 @@ uptest: $(UPTEST) $(KUBECTL) $(KUTTL)
 e2e: build controlplane.up local.xpkg.deploy.configuration.$(PROJECT_NAME) uptest
 
 render:
-	crossplane beta render examples/network-xr.yaml apis/basic/composition.yaml examples/function/function.yaml -r
+	crossplane beta render examples/network-xr.yaml apis/basic/composition.yaml examples/function/function.yaml -r -o examples/observed.yaml
 
 .PHONY: uptest e2e render

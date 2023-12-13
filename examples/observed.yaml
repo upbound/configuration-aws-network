@@ -1,0 +1,34 @@
+---
+apiVersion: ec2.aws.upbound.io/v1beta1
+kind: Subnet
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: subnetPublicA
+    crossplane.io/external-name: subnetPublicAextnameTest # works for XR status, but not visible itself in render output
+  generateName: ref-aws-network-
+  labels:
+    access: public
+    crossplane.io/composite: ref-aws-network
+    networks.aws.platform.upbound.io/network-id: platform-ref-aws
+    zone: us-west-2a
+  ownerReferences:
+  - apiVersion: aws.platform.upbound.io/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: XNetwork
+    name: ref-aws-network
+    uid: ""
+spec:
+  forProvider:
+    availabilityZone: us-west-2a
+    cidrBlock: 192.168.0.0/18
+    mapPublicIpOnLaunch: true
+    region: us-west-2
+    tags:
+      kubernetes.io/role/elb: "1"
+      networks.aws.platform.upbound.io/network-id: platform-ref-aws
+    vpcIdSelector:
+      matchControllerRef: true
+status:
+  atProvider:
+    id: subnet-id-test
