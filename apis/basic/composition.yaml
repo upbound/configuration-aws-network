@@ -129,8 +129,14 @@ spec:
                       type: Format
                     type: string
                 type: FromCompositeFieldPath
-              - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+              - fromFieldPath: metadata.annotations[crossplane.io/external-name] # renders with observed mock
                 toFieldPath: status.subnetIds[0]
+                type: ToCompositeFieldPath
+              - fromFieldPath: status.atProvider.id # renders with observed mock
+                toFieldPath: status.test
+                type: ToCompositeFieldPath
+              - fromFieldPath: spec.forProvider.cidrBlock # just renders
+                toFieldPath: status.cidrBlock
                 type: ToCompositeFieldPath
 
           - name: subnetPublicB
