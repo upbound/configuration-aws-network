@@ -30,15 +30,6 @@
       "depNameTemplate": "upbound/uptest",
     }, {
       "customType": "regex",
-      "description": "Bump crossplane in crossplane.yaml",
-      "fileMatch": ["crossplane.yaml"],
-      "matchStrings": [
-        "spec:\\s*crossplane:\\s*version:\\s*\"(?<currentValue>[^\"]+)\""
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "upbound/universal-crossplane",
-    }, {
-      "customType": "regex",
       "description": "Bump providers/functions/configurations in crossplane.yaml",
       "fileMatch": ["crossplane.yaml"],
       "matchStrings": [
