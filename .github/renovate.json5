@@ -36,7 +36,7 @@
         "spec:\\s*crossplane:\\s*version:\\s*\"(?<currentValue>[^\"]+)\""
       ],
       "datasourceTemplate": "github-releases",
-      "depNameTemplate": "crossplane/crossplane",
+      "depNameTemplate": "upbound/universal-crossplane",
     }, {
       "customType": "regex",
       "description": "Bump providers/functions/configurations in crossplane.yaml",
