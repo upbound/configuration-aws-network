@@ -8,7 +8,7 @@ metadata:
     meta.crossplane.io/license: Apache-2.0
 spec:
   crossplane:
-    version: "v1.14.1-0"
+    version: ">=v1.14.1-0"
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-family-aws
       # renovate: datasource=github-releases depName=upbound/provider-aws
