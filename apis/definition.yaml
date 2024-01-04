@@ -30,8 +30,8 @@ spec:
                     deletionPolicy:
                       description: Delete the external resources when the Claim/XR is deleted. Defaults to Delete
                       enum:
-                      - Delete
-                      - Orphan
+                        - Delete
+                        - Orphan
                       type: string
                       default: Delete
                     providerConfigName:
@@ -39,10 +39,10 @@ spec:
                       type: string
                       default: default
                   required:
-                  - deletionPolicy
-                  - providerConfigName
-                  - id
-                  - region
+                    - deletionPolicy
+                    - providerConfigName
+                    - id
+                    - region
                   type: object
               required:
                 - parameters
