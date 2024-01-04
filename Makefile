@@ -75,4 +75,9 @@ e2e: build controlplane.up local.xpkg.deploy.configuration.$(PROJECT_NAME) uptes
 render:
 	crossplane beta render examples/network-xr.yaml apis/basic/composition.yaml examples/function/function.yaml -r
 
-.PHONY: uptest e2e render
+yamllint:
+	@$(INFO) running yamllint
+	@yamllint ./apis || $(FAIL)
+	@$(OK) running yamllint
+
+.PHONY: uptest e2e render yamllint
