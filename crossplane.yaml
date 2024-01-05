@@ -12,7 +12,7 @@ spec:
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-aws-ec2
       # renovate: datasource=github-releases depName=upbound/provider-aws
-      version: "v0.47.0"
+      version: "v0.47.1"
     - function: xpkg.upbound.io/upbound/function-patch-and-transform
       # renovate: datasource=github-releases depName=upbound/function-patch-and-transform
       version: "v0.2.1"
