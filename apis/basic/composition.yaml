@@ -21,29 +21,29 @@ spec:
         patchSets:
           - name: providerConfigRef
             patches:
-              - fromFieldPath: spec.parameters.providerConfigName
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.providerConfigName
                 toFieldPath: spec.providerConfigRef.name
-                type: FromCompositeFieldPath
           - name: deletionPolicy
             patches:
-              - fromFieldPath: spec.parameters.deletionPolicy
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.deletionPolicy
                 toFieldPath: spec.deletionPolicy
-                type: FromCompositeFieldPath
           - name: network-id
             patches:
-              - fromFieldPath: spec.parameters.id
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.id
                 toFieldPath: metadata.labels[networks.aws.platform.upbound.io/network-id]
-                type: FromCompositeFieldPath
           - name: network-id-tags
             patches:
-              - fromFieldPath: spec.parameters.id
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.id
                 toFieldPath: spec.forProvider.tags[networks.aws.platform.upbound.io/network-id]
-                type: FromCompositeFieldPath
           - name: region
             patches:
-              - fromFieldPath: spec.parameters.region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.region
-                type: FromCompositeFieldPath
         resources:
           - name: vpc
             base:
@@ -57,17 +57,20 @@ spec:
                   tags:
                     Name: ""
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: metadata.name
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
                 toFieldPath: spec.forProvider.tags["Name"]
-                type: FromCompositeFieldPath
+              - type: ToCompositeFieldPath
+                fromFieldPath: status.atProvider.id
+                toFieldPath: status.vpcId
 
           - name: internetGateway
             base:
@@ -78,14 +81,14 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
 
           - name: subnetPublicA
             base:
@@ -103,35 +106,38 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: network-id-tags
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: network-id-tags
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.availabilityZone
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sa'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: spec.parameters.region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: metadata.labels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sa'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.subnetIds[0]
-                type: ToCompositeFieldPath
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
+                toFieldPath: status.publicSubnetIds[0]
 
           - name: subnetPublicB
             base:
@@ -149,35 +155,38 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: network-id-tags
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: network-id-tags
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.availabilityZone
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sb'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: spec.parameters.region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: metadata.labels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sb'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.subnetIds[1]
-                type: ToCompositeFieldPath
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
+                toFieldPath: status.publicSubnetIds[1]
 
           - name: subnetPrivateA
             base:
@@ -194,33 +203,36 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.availabilityZone
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sa'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: spec.parameters.region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: metadata.labels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sa'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.subnetIds[2]
-                type: ToCompositeFieldPath
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
+                toFieldPath: status.privateSubnetIds[0]
 
           - name: subnetPrivateB
             base:
@@ -237,33 +249,36 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.availabilityZone
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sb'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: spec.parameters.region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: metadata.labels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sb'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
-              - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.subnetIds[3]
-                type: ToCompositeFieldPath
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
+                toFieldPath: status.privateSubnetIds[1]
 
           - name: routeTable
             base:
@@ -274,14 +289,14 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
 
           - name: route
             base:
@@ -295,14 +310,14 @@ spec:
                   routeTableIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
 
           - name: mainRouteTableAssociation
             base:
@@ -315,14 +330,14 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
 
           - name: routeTableAssociationPublicA
             base:
@@ -337,22 +352,22 @@ spec:
                     matchLabels:
                       access: public
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.subnetIdSelector.matchLabels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sa'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
 
           - name: routeTableAssociationPublicB
             base:
@@ -367,22 +382,22 @@ spec:
                     matchLabels:
                       access: public
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.subnetIdSelector.matchLabels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sb'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
 
           - name: routeTableAssociationPrivateA
             base:
@@ -397,22 +412,22 @@ spec:
                     matchLabels:
                       access: private
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.subnetIdSelector.matchLabels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sa'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
 
           - name: routeTableAssociationPrivateB
             base:
@@ -427,22 +442,22 @@ spec:
                     matchLabels:
                       access: private
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: spec.parameters.region
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.region
                 toFieldPath: spec.forProvider.subnetIdSelector.matchLabels[zone]
                 transforms:
-                  - string:
+                  - type: string
+                    string:
                       fmt: '%sb'
                       type: Format
-                    type: string
-                type: FromCompositeFieldPath
 
           - name: securityGroup
             base:
@@ -455,17 +470,17 @@ spec:
                   vpcIdSelector:
                     matchControllerRef: true
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
-              - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]
                 toFieldPath: status.securityGroupIds[0]
-                type: ToCompositeFieldPath
 
           - name: securityGroupRulePostgres
             base:
@@ -483,14 +498,14 @@ spec:
                   toPort: 5432
                   type: ingress
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
 
           - name: securityGroupRuleMysql
             base:
@@ -508,11 +523,11 @@ spec:
                   toPort: 3306
                   type: ingress
             patches:
-              - patchSetName: providerConfigRef
-                type: PatchSet
-              - patchSetName: deletionPolicy
-                type: PatchSet
-              - patchSetName: network-id
-                type: PatchSet
-              - patchSetName: region
-                type: PatchSet
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region

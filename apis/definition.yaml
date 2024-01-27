@@ -49,7 +49,17 @@ spec:
             status:
               type: object
               properties:
+                vpcId:
+                  type: string
                 subnetIds:
+                  type: array
+                  items:
+                    type: string
+                publicSubnetIds:
+                  type: array
+                  items:
+                    type: string
+                privateSubnetIds:
                   type: array
                   items:
                     type: string
