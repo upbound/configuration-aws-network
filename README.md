@@ -1,7 +1,7 @@
-# [] Configuration
+# AWS Network Configuration
 
 
-This repository contains a [Crossplane configuration](https://docs.crossplane.io/v1.11/concepts/packages/#configuration-packages), tailored for users establishing their initial control plane with [Upbound](https://cloud.upbound.io). This configuration deploys fully managed []() instances.
+This repository contains a [Crossplane configuration](https://docs.crossplane.io/v1.11/concepts/packages/#configuration-packages), tailored for users establishing their initial control plane with [Upbound](https://cloud.upbound.io). This configuration deploys fully managed [AWS networking]() resources.
 
 ## Overview
 
@@ -10,7 +10,7 @@ The core components of a custom API in [Crossplane](https://docs.crossplane.io/v
 - **CompositeResourceDefinition (XRD):** Defines the API's structure.
 - **Composition(s):** Implements the API by orchestrating a set of Crossplane managed resources.
 
-In this specific configuration, the [EKS] API contains:
+In this specific configuration, the AWS Network API contains:
 
 - **an [](/apis/definition.yaml) custom resource type.**
 - **Composition of the [] resources:** Configured in [/apis/composition.yaml](/apis/composition.yaml), it provisions an [] and resources in the `upbound-system` namespace.
@@ -23,9 +23,9 @@ This repository contains an Composite Resource (XR) file.
 apiVersion: pkg.crossplane.io/v1
 kind: Configuration
 metadata:
-  name: PACKAGE NAME
+  name: configuration-aws-network
 spec:
-  package: PACKAGE SPEC
+  package: xpkg.upbound.io/upbound/configuration-aws-network:v0.9.0
 ```
 
 ## Next steps
