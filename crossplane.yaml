@@ -6,6 +6,12 @@ metadata:
     meta.crossplane.io/maintainer: Upbound <support@upbound.io>
     meta.crossplane.io/source: github.com/upbound/configuration-aws-network
     meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      This configuration provides a foundation to build and operate AWS networks.
+    meta.crossplane.io/readme: |
+     This configuration is used for deploying and managing AWS network clusters on Kubernetes using Crossplane. This setup provides the necessary infrastructure to deploy AWS network managed with Crossplane in Kubernetes. This approach ensures a flexible, streamlined deployment workflow.
+
+     For more details and customization options, you can explore [the GitHub repository](https://github.com/upbound/configuration-aws-network).
 spec:
   crossplane:
     version: ">=v1.14.1-0"
