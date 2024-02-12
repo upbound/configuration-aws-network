@@ -13,7 +13,7 @@ The core components of a custom API in [Crossplane](https://docs.crossplane.io/l
 In this specific configuration, the AWS Network API contains:
 
 - **an [AWS network](/apis/definition.yaml) custom resource type.**
-- **Composition of the networking resources:** Configured in [/apis/composition.yaml](/apis/composition.yaml), it provisions networking resources in the `upbound-system` namespace.
+- **Composition of the networking resources:** Configured in [/apis/basic/composition.yaml](/apis/basic/composition.yaml), it provisions networking resources in the `upbound-system` namespace.
 
 This repository contains an Composite Resource (XR) file.
 
@@ -25,7 +25,7 @@ kind: Configuration
 metadata:
   name: configuration-aws-network
 spec:
-  package: xpkg.upbound.io/upbound/configuration-aws-network:v0.9.0
+  package: xpkg.upbound.io/upbound/configuration-aws-network:v0.10.0
 ```
 
 ## Next steps
