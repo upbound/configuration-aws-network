@@ -18,7 +18,7 @@ spec:
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-aws-ec2
       # renovate: datasource=github-releases depName=upbound/provider-aws
-      version: "v1.1.0"
+      version: "v1.2.0"
     - function: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform
       # renovate: datasource=github-releases depName=crossplane-contrib/function-patch-and-transform
       version: "v0.3.0"
