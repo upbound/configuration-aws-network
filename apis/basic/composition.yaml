@@ -532,21 +532,42 @@ spec:
               - type: PatchSet
                 patchSetName: region
 
-          - name: securityGroupRuleRedis
+          - name: securityGroupIngressRuleRedis
             base:
               apiVersion: ec2.aws.upbound.io/v1beta1
-              kind: SecurityGroupRule
+              kind: SecurityGroupIngressRule
               spec:
                 forProvider:
-                  cidrBlocks:
-                    - 0.0.0.0/0
-                  description: Everywhere
+                  cidrIpv4: "0.0.0.0/0"
+                  description: "Redis Access From Everywhere"
                   fromPort: 6379
-                  protocol: tcp
+                  ipProtocol: "tcp"
                   securityGroupIdSelector:
                     matchControllerRef: true
                   toPort: 6379
-                  type: ingress
+            patches:
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
+
+          - name: securityGroupIngressRuleMemcached
+            base:
+              apiVersion: ec2.aws.upbound.io/v1beta1
+              kind: SecurityGroupIngressRule
+              spec:
+                forProvider:
+                  cidrIpv4: "0.0.0.0/0"
+                  description: "Memcached Access From Everywhere"
+                  fromPort: 11211
+                  ipProtocol: "tcp"
+                  securityGroupIdSelector:
+                    matchControllerRef: true
+                  toPort: 11211
             patches:
               - type: PatchSet
                 patchSetName: providerConfigRef
