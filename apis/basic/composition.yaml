@@ -531,3 +531,28 @@ spec:
                 patchSetName: network-id
               - type: PatchSet
                 patchSetName: region
+
+          - name: securityGroupRuleRedis
+            base:
+              apiVersion: ec2.aws.upbound.io/v1beta1
+              kind: SecurityGroupRule
+              spec:
+                forProvider:
+                  cidrBlocks:
+                    - 0.0.0.0/0
+                  description: Everywhere
+                  fromPort: 6379
+                  protocol: tcp
+                  securityGroupIdSelector:
+                    matchControllerRef: true
+                  toPort: 6379
+                  type: ingress
+            patches:
+              - type: PatchSet
+                patchSetName: providerConfigRef
+              - type: PatchSet
+                patchSetName: deletionPolicy
+              - type: PatchSet
+                patchSetName: network-id
+              - type: PatchSet
+                patchSetName: region
