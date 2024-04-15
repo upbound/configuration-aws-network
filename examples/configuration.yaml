@@ -3,4 +3,4 @@ kind: Configuration
 metadata:
   name: configuration-aws-network
 spec:
-  package: xpkg.upbound.io/upbound/configuration-aws-network:v0.1.2
+  package: xpkg.upbound.io/upbound/configuration-aws-network:v0.12.0
