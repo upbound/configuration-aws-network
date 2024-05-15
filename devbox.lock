@@ -1,0 +1,69 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "crossplane@latest": {
+      "last_modified": "2024-05-13T18:06:16Z",
+      "resolved": "github:NixOS/nixpkgs/1daef0114a6074be56586f2cf81898ed142e1e44#crossplane",
+      "source": "devbox-search",
+      "version": "0.5.8",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/2kf88i0mrgiqqmi5ppvwkjy4rvjg52r8-python3.11-crossplane-0.5.8",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/sp6m4f6lr84xmy89qcxkyxcxqh2k4k09-python3.11-crossplane-0.5.8-dist"
+            }
+          ],
+          "store_path": "/nix/store/2kf88i0mrgiqqmi5ppvwkjy4rvjg52r8-python3.11-crossplane-0.5.8"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/w1y44jk4b4s1qj9rrn0z9ygg4bk7f4fw-python3.11-crossplane-0.5.8",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/wvgsrs83asv7jsq6ld2pp8qgysv3crvw-python3.11-crossplane-0.5.8-dist"
+            }
+          ],
+          "store_path": "/nix/store/w1y44jk4b4s1qj9rrn0z9ygg4bk7f4fw-python3.11-crossplane-0.5.8"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/90mp5kxb7bac37p0p8q4d38wv3djm0wz-python3.11-crossplane-0.5.8",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/hjxshzb4zbj0q8j78krp8vy2v5dz2hia-python3.11-crossplane-0.5.8-dist"
+            }
+          ],
+          "store_path": "/nix/store/90mp5kxb7bac37p0p8q4d38wv3djm0wz-python3.11-crossplane-0.5.8"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/cgva3s7jbz8whz4wd1cqkbzbsdgi067b-python3.11-crossplane-0.5.8",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/6y6l7isyi3ridw2c5h45h8s8wclcxbni-python3.11-crossplane-0.5.8-dist"
+            }
+          ],
+          "store_path": "/nix/store/cgva3s7jbz8whz4wd1cqkbzbsdgi067b-python3.11-crossplane-0.5.8"
+        }
+      }
+    }
+  }
+}

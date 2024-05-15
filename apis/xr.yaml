@@ -1,0 +1,8 @@
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: XNetwork
+metadata:
+  name: ref-aws-network
+spec:
+  parameters:
+    id: platform-ref-aws
+    region: us-west-2

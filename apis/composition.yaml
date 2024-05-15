@@ -1,0 +1,50 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: example-inline
+spec:
+  compositeTypeRef:
+    apiVersion: example.crossplane.io/v1beta1
+    kind: XR
+  mode: Pipeline
+  pipeline:
+    - step: render-templates
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{ $params := .observed.composite.resource.spec.parameters }}
+            {{ $desired := .composed.desired.composite.resource }}
+            
+            {{- define "providerConfigRef" }}
+              providerConfigRef:
+                name: {{ .observed.composite.resource.spec.parameters.id  }}
+            {{- end }}
+            {{- define "networkId" }}
+              networks.aws.platform.upbound.io/network-id: {{ .observed.composite.resource.spec.parameters.id }}
+            {{- end }}
+            {{- define "region" }}
+              region: {{ .observed.composite.resource.spec.parameters.region }}
+            {{- end }}
+
+            apiVersion: ec2.aws.upbound.io/v1beta1
+            kind: VPC
+            metadata:
+              labels:
+                {{- include "networkId" . | nindent 4 }}
+              annotations:
+                {{ setResourceNameAnnotation ("vpc") }}
+            spec:
+              forProvider:
+                cidrBlock: 192.168.0.0/16
+                enableDnsHostnames: true
+                enableDnsSupport: true
+                tags:
+                  Name: {{ .observed.composite.resource.metadata.name }}
+                {{- include "region" . | nindent 2 }}
+            {{ template "providerConfigRef" . }}
+            status: {{ (index .desired.composed "resource-name").resource.spec.widgets }}
