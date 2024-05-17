@@ -7,7 +7,7 @@ spec:
     id: platform-ref-aws
     region: us-west-2
     deletionPolicy: Delete
-    providerConfigName: aws-provider-config
+    providerConfigName: default
     subnets:
       - availabilityZone: us-west-2a
         type: public

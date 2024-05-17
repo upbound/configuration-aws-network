@@ -1,16 +1,19 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: example-inline
+  name: xnetworks.aws.platform.upbound.io
+  labels:
+    provider: aws
+    type: basic
 spec:
   compositeTypeRef:
-    apiVersion: example.crossplane.io/v1beta1
-    kind: XR
+    apiVersion: aws.platform.upbound.io/v1alpha1
+    kind: XNetwork
   mode: Pipeline
   pipeline:
     - step: render-templates
       functionRef:
-        name: function-go-templating
+        name: crossplane-contrib-function-go-templating
       input:
         apiVersion: gotemplating.fn.crossplane.io/v1beta1
         kind: GoTemplate
@@ -160,6 +163,7 @@ spec:
               {{- include "deletionPolicy" . }}
             {{- range $i, $subnet := $params.subnets }}
             ---
+            apiVersion: ec2.aws.upbound.io/v1beta1
             kind: RouteTableAssociation
             metadata:
               labels:
@@ -270,4 +274,4 @@ spec:
                 - {{ dig "resources" "sg" "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
     - step: automatically-detect-ready-composed-resources
       functionRef:
-        name: function-auto-ready
+        name: crossplane-contrib-function-auto-ready
