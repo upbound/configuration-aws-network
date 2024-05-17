@@ -18,7 +18,7 @@ spec:
         inline:
           template: |
             {{ $params := .observed.composite.resource.spec.parameters }}
-                       
+
             {{- define "providerConfigRef" }}
               providerConfigRef:
                 name: {{ .observed.composite.resource.spec.parameters.providerConfigName  }}
@@ -50,7 +50,7 @@ spec:
                 {{- include "region" . | nindent 2 }}
               {{- include "providerConfigRef" . }}
               {{- include "deletionPolicy" . }}
-            
+
             ---
             apiVersion: ec2.aws.upbound.io/v1beta1
             kind: InternetGateway
@@ -245,7 +245,7 @@ spec:
                 {{- include "region" . | nindent 2 }}
               {{- include "providerConfigRef" . }}
               {{- include "deletionPolicy" . }}
-            ---            
+            ---
             apiVersion: {{ .observed.composite.resource.apiVersion }}
             kind: {{ .observed.composite.resource.kind }}
             status:
@@ -271,4 +271,3 @@ spec:
     - step: automatically-detect-ready-composed-resources
       functionRef:
         name: function-auto-ready
-            
