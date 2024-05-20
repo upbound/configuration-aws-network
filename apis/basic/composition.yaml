@@ -7,7 +7,7 @@ metadata:
     type: basic
 spec:
   compositeTypeRef:
-    apiVersion: aws.platform.upbound.io/v1alpha1
+    apiVersion: aws.platform.upbound.io/v1alpha2
     kind: XNetwork
   mode: Pipeline
   pipeline:
