@@ -90,7 +90,7 @@ spec:
                 {{ setResourceNameAnnotation (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) }}
             spec:
               forProvider:
-                cidrBlock: 192.168.0.0/18
+                cidrBlock: {{ $subnet.cidrBlock }}
                 {{ if eq $subnet.type "public" }}
                 mapPublicIpOnLaunch: true
                 {{ end }}
@@ -172,11 +172,11 @@ spec:
                 {{ setResourceNameAnnotation (printf "rta-%s-%s" $subnet.availabilityZone $subnet.type) }}
             spec:
               forProvider:
+                region: {{ $region }}
                 routeTableIdSelector:
                   matchControllerRef: true
                 subnetIdSelector:
                   matchControllerRef: true
-                  region: {{ $region }}
                   matchLabels:
                     {{- if eq $subnet.type "private" }}
                     access: private
