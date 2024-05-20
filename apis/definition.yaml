@@ -38,6 +38,10 @@ spec:
                       description: Crossplane ProviderConfig to use for provisioning this resources
                       type: string
                       default: default
+                    vpcCidrBlock:
+                      type: string
+                      description: CIDR block for the VPC
+                      default: 192.168.0.0/16
                     subnets:
                       type: array
                       items:
@@ -75,6 +79,8 @@ spec:
                     - providerConfigName
                     - id
                     - region
+                    - subnets
+                    - vpcCidrBlock
                   type: object
               required:
                 - parameters

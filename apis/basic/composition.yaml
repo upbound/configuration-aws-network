@@ -45,7 +45,7 @@ spec:
                 {{ setResourceNameAnnotation ("vpc") }}
             spec:
               forProvider:
-                cidrBlock: 192.168.0.0/16
+                cidrBlock: {{ $params.vpcCidrBlock }}
                 enableDnsHostnames: true
                 enableDnsSupport: true
                 tags:
