@@ -8,7 +8,7 @@ spec:
     kind: XNetwork
     plural: xnetworks
   versions:
-    - name: v1alpha2
+    - name: v1alpha1
       served: true
       referenceable: true
       schema:
