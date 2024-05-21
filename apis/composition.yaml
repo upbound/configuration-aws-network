@@ -70,7 +70,7 @@ spec:
               {{- include "providerConfigRef" . }}
               {{- include "deletionPolicy" . }}
 
-            {{ $region := .observed.composite.resource.spec.parameters.region }}
+            {{ $region := $params.region }}
             {{ $deletionPolicy := .observed.composite.resource.spec.parameters.deletionPolicy | default "Delete" }}
 
             {{- range $i, $subnet := $params.subnets }}
