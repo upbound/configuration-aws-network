@@ -4,7 +4,6 @@ metadata:
   name: xnetworks.aws.platform.upbound.io
   labels:
     provider: aws
-    type: basic
 spec:
   compositeTypeRef:
     apiVersion: aws.platform.upbound.io/v1alpha1
