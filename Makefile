@@ -27,8 +27,12 @@ XPKG_REG_ORGS_NO_PROMOTE ?= xpkg.upbound.io/upbound
 XPKGS = $(PROJECT_NAME)
 -include build/makelib/xpkg.mk
 
+CROSSPLANE_VERSION = 1.16.0-up.1
+CROSSPLANE_CHART_REPO = https://charts.upbound.io/stable
+CROSSPLANE_CHART_NAME = universal-crossplane
 CROSSPLANE_NAMESPACE = upbound-system
 CROSSPLANE_ARGS = "--enable-usages"
+KIND_CLUSTER_NAME = uptest-$(PROJECT_NAME)
 -include build/makelib/local.xpkg.mk
 -include build/makelib/controlplane.mk
 
@@ -70,7 +74,7 @@ uptest: $(UPTEST) $(KUBECTL) $(KUTTL)
 
 # This target requires the following environment variables to be set:
 # - UPTEST_CLOUD_CREDENTIALS, cloud credentials for the provider being tested, e.g. export UPTEST_CLOUD_CREDENTIALS=$(cat ~/.aws/credentials)
-e2e: build controlplane.up local.xpkg.deploy.configuration.$(PROJECT_NAME) uptest
+e2e: build controlplane.down controlplane.up local.xpkg.deploy.configuration.$(PROJECT_NAME) uptest
 
 render:
 	crossplane beta render examples/network-xr.yaml apis/composition.yaml examples/functions.yaml -r
