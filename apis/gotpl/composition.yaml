@@ -4,13 +4,14 @@ metadata:
   name: xnetworks.aws.platform.upbound.io
   labels:
     provider: aws
+    function: go-templating
 spec:
   compositeTypeRef:
     apiVersion: aws.platform.upbound.io/v1alpha1
     kind: XNetwork
   mode: Pipeline
   pipeline:
-    - step: render-templates
+    - step: go-templating
       functionRef:
         name: crossplane-contrib-function-go-templating
       input:
@@ -246,25 +247,62 @@ spec:
             apiVersion: {{ .observed.composite.resource.apiVersion }}
             kind: {{ .observed.composite.resource.kind }}
             status:
-              vpcId: {{ dig "resources" "vpc" "resource" "status" "atProvider" "id" "" $.observed }}
+              {{- $vpcId := dig "resources" "vpc" "resource" "status" "atProvider" "id" "" $.observed }}
+              {{- if $vpcId }}
+              vpcId: {{ $vpcId }}
+              {{- end }}
+
+              {{- $subnetIds := list }}
+              {{- range $i, $subnet := $params.subnets }}
+              {{- $subnetId := dig "resources" (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+              {{- if $subnetId }}
+              {{- $subnetIds = append $subnetIds $subnetId }}
+              {{- end }}
+              {{- end }}
+              {{- if $subnetIds }}
               subnetIds:
-                {{- range $i, $subnet := $params.subnets }}
-                - {{ dig "resources" (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+                {{- range $id := $subnetIds }}
+                - {{ $id }}
                 {{- end }}
+              {{- end }}
+
+              {{- $publicSubnetIds := list }}
+              {{- range $i, $subnet := $params.subnets }}
+              {{- if eq $subnet.type "public" }}
+              {{- $publicSubnetId := dig "resources" (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+              {{- if $publicSubnetId }}
+              {{- $publicSubnetIds = append $publicSubnetIds $publicSubnetId }}
+              {{- end }}
+              {{- end }}
+              {{- end }}
+              {{- if $publicSubnetIds }}
               publicSubnetIds:
-                {{- range $i, $subnet := $params.subnets }}
-                {{- if eq $subnet.type "public" }}
-                - {{ dig "resources" (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+                {{- range $id := $publicSubnetIds }}
+                - {{ $id }}
                 {{- end }}
-                {{- end }}
+              {{- end }}
+
+              {{- $privateSubnetIds := list }}
+              {{- range $i, $subnet := $params.subnets }}
+              {{- if eq $subnet.type "private" }}
+              {{- $privateSubnetId := dig "resources" (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+              {{- if $privateSubnetId }}
+              {{- $privateSubnetIds = append $privateSubnetIds $privateSubnetId }}
+              {{- end }}
+              {{- end }}
+              {{- end }}
+              {{- if $privateSubnetIds }}
               privateSubnetIds:
-                {{- range $i, $subnet := $params.subnets }}
-                {{- if eq $subnet.type "private" }}
-                - {{ dig "resources" (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+                {{- range $id := $privateSubnetIds }}
+                - {{ $id }}
                 {{- end }}
-                {{- end }}
+              {{- end }}
+
+              {{- $sgId := dig "resources" "sg" "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+              {{- if $sgId }}
               securityGroupIds:
-                - {{ dig "resources" "sg" "resource" "metadata" "annotations" "crossplane.io/external-name" "" $.observed }}
+                - {{ $sgId }}
+              {{- end }}
     - step: automatically-detect-ready-composed-resources
       functionRef:
         name: crossplane-contrib-function-auto-ready

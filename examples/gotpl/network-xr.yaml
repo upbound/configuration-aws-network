@@ -1,10 +1,13 @@
 apiVersion: aws.platform.upbound.io/v1alpha1
 kind: XNetwork
 metadata:
-  name: ref-aws-network
+  name: configuration-aws-network
+  annotations:
+    render.crossplane.io/composition-path: apis/gotpl/composition.yaml
+    render.crossplane.io/function-path: examples/functions.yaml
 spec:
   parameters:
-    id: platform-ref-aws
+    id: configuration-aws-network
     region: us-west-2
     vpcCidrBlock: 192.168.0.0/16
     subnets:
