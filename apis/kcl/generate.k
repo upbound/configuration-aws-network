@@ -25,7 +25,7 @@ _composition = {
                 }
                 input = {
                     apiVersion = "krm.kcl.dev/v1alpha1"
-                    kind = "KCLRun"
+                    kind = "KCLInput"
                     spec = {
                         source = (file.read("apis/kcl/main.k"))
                     }
