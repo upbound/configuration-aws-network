@@ -75,7 +75,7 @@ spec:
                   {{- end }}
                   networks.aws.platform.upbound.io/network-id: {{ $params.id }}
               annotations:
-                {{ setResourceNameAnnotation (printf "subnet-%s-%s" $subnet.availabilityZone $subnet.type) }}
+                {{ setResourceNameAnnotation (printf "subnet-%s-%s-%s" $subnet.availabilityZone (regexReplaceAll "\\.|\\/" $subnet.cidrBlock "-") $subnet.type) }}
             spec:
               forProvider:
                 cidrBlock: {{ $subnet.cidrBlock }}
@@ -160,7 +160,7 @@ spec:
               labels:
                 networks.aws.platform.upbound.io/network-id: {{ $params.id }}
               annotations:
-                {{ setResourceNameAnnotation (printf "rta-%s-%s" $subnet.availabilityZone $subnet.type) }}
+                {{ setResourceNameAnnotation (printf "rta-%s-%s-%s" $subnet.availabilityZone (regexReplaceAll "\\.|\\/" $subnet.cidrBlock "-") $subnet.type) }}
             spec:
               forProvider:
                 region: {{ $region }}

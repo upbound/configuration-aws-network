@@ -6,6 +6,9 @@ metadata:
     render.crossplane.io/composition-path: apis/gotpl/composition.yaml
     render.crossplane.io/function-path: examples/functions.yaml
 spec:
+  compositionSelector:
+    matchLabels:
+      function: go-templating
   parameters:
     id: configuration-aws-network
     region: us-west-2

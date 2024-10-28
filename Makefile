@@ -20,6 +20,13 @@
 # - `e2e`
 #   Runs full end-to-end test, including creating cluster, setting up the configuration
 #   and testing if create, import and delete work as expected.
+#   In case the configuration creates resources on a cloud provider, it requires the following
+#   environment variables to be set:
+#   UPTEST_CLOUD_CREDENTIALS, cloud credentials for the provider being tested, e.g.
+#   	- for aws: `export UPTEST_CLOUD_CREDENTIALS=$(cat ~/.aws/credentials)`
+#   	- for gcp: `export UPTEST_CLOUD_CREDENTIALS=$(cat gcp-sa.json)`
+#   	- for azure: `export UPTEST_CLOUD_CREDENTIALS=$(cat azure.json)`
+#
 #	Available options:
 #		UPTEST_SKIP_DELETE (default `false`) skips the deletion of any resources created during the test
 #		UPTEST_SKIP_UPDATE (default `false`) skips testing the update of the claims
@@ -30,7 +37,7 @@
 # Language specific options:
 #
 # - `KCL`
-#	KCL_COMPOSITION_PATH can be set to the kcl-file creating composition.yaml. Default: `apis/kcl/generate.k`
+#      KCL_COMPOSITION_PATH can be set to the kcl-file creating composition.yaml. Default: `apis/kcl/generate.k`
 
 # Project Setup
 # ====================================================================================
@@ -61,7 +68,7 @@ CROSSPLANE_CLI_VERSION = v1.17.1
 # ====================================================================================
 # Setup XPKG
 XPKG_DIR = $(shell pwd)
-XPKG_IGNORE = .github/workflows/*.yaml,.github/workflows/*.yml,examples/*.yaml,.work/uptest-datasource.yaml
+XPKG_IGNORE = .github/workflows/*.yaml,.github/workflows/*.yml,examples/*.yaml,.work/uptest-datasource.yaml,.cache/render/*
 XPKG_REG_ORGS ?= xpkg.upbound.io/upbound
 # NOTE(hasheddan): skip promoting on xpkg.upbound.io as channel tags are
 # inferred.
@@ -116,13 +123,22 @@ LANG_KCL := $(shell find ./apis -type f -name '*.k')
 ifdef LANG_KCL
 kcl: $(KCL) ## Generate KCL-based Composition
 	@$(INFO) Generating kcl composition
-	$(KCL) $(KCL_COMPOSITION_PATH)
+	@$(KCL) $(KCL_COMPOSITION_PATH) 1>/dev/null
 	@$(OK) Generated kcl composition
 
 render: kcl
 build.init: kcl
 .PHONY: kcl
 endif
+
+render.test: $(CROSSPLANE_CLI) $(KCL) render
+	@for RENDERED_COMPOSITION in $$(find .cache/render -depth 1 -type f -name "*.yaml"); do \
+		$(INFO) "Testing $${RENDERED_COMPOSITION}"; \
+		export RENDERED_COMPOSITION; \
+		$(KCL) test test/ && \
+		$(OK) "Success testing \"$${RENDERED_COMPOSITION}\"!" || \
+		$(ERR) "Failure testing \"$${RENDERED_COMPOSITION}\"!"; \
+	done; \
 
 .PHONY: check-examples
 check-examples: ## Check examples for sanity
