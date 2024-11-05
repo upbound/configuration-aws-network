@@ -23,6 +23,10 @@
 #   or together with 'crossplane validate', e.g.:
 #   	`make render.show | crossplane beta validate crossplane.yaml -`
 #
+# - `render.test`
+#   Executes kcl-unit tests on rendered manifests. Tests live in `test`-folder and
+#   can be written as normal kcl-tests
+#
 # - `e2e`
 #   Runs full end-to-end test, including creating cluster, setting up the configuration
 #   and testing if create, import and delete work as expected.
@@ -138,12 +142,13 @@ build.init: kcl
 endif
 
 render.test: $(CROSSPLANE_CLI) $(KCL) render
-	@for RENDERED_COMPOSITION in $$(find .cache/render -depth 1 -type f -name "*.yaml"); do \
+	@echo find .cache/render -depth 1 -type f -name '*.yaml'
+	@for RENDERED_COMPOSITION in $$(find .cache/render -maxdepth 1 -type f -name '*.yaml'); do \
 		$(INFO) "Testing $${RENDERED_COMPOSITION}"; \
 		export RENDERED_COMPOSITION; \
 		$(KCL) test test/ && \
 		$(OK) "Success testing \"$${RENDERED_COMPOSITION}\"!" || \
-		$(ERR) "Failure testing \"$${RENDERED_COMPOSITION}\"!"; \
+		($(ERR) "Failure testing \"$${RENDERED_COMPOSITION}\"!" && exit 1); \
 	done; \
 
 .PHONY: check-examples
