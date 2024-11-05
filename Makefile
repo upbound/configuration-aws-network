@@ -16,6 +16,12 @@
 #		if necessary):
 #			render.crossplane.io/composition-path: apis/pat/composition.yaml
 #			render.crossplane.io/function-path: examples/functions.yaml
+#		This will only populate the cache. Use `render.show` to use the output
+#
+# - `render.show`
+#   Outputs the rendered yaml, useful for validating the rendered output manually
+#   or together with 'crossplane validate', e.g.:
+#   	`make render.show | crossplane beta validate crossplane.yaml -`
 #
 # - `e2e`
 #   Runs full end-to-end test, including creating cluster, setting up the configuration
