@@ -9,6 +9,20 @@
   "prConcurrentLimit": 5,
   "baseBranches": ["main"],
   "labels": ["automated"],
+  "packageRules": [
+    {
+      "matchFiles": [".github/**"],
+      "groupName": "github-actions dependencies"
+    },
+    {
+      "matchFiles": ["crossplane.yaml"],
+      "groupName": "crossplane dependencies"
+    },
+    {
+      "matchFiles": ["Makefile"],
+      "groupName": "Makefile dependencies"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
@@ -18,8 +32,9 @@
         "UP_VERSION = (?<currentValue>.*?)\\n"
       ],
       "datasourceTemplate": "github-releases",
-      "depNameTemplate": "upbound/up",
-    }, {
+      "depNameTemplate": "upbound/up"
+    },
+    {
       "customType": "regex",
       "description": "Bump uptest version in the Makefile",
       "fileMatch": ["^Makefile$"],
@@ -27,8 +42,9 @@
         "UPTEST_VERSION = (?<currentValue>.*?)\\n"
       ],
       "datasourceTemplate": "github-releases",
-      "depNameTemplate": "upbound/uptest",
-    }, {
+      "depNameTemplate": "upbound/uptest"
+    },
+    {
       "customType": "regex",
       "description": "Bump providers/functions/configurations in crossplane.yaml",
       "fileMatch": ["crossplane.yaml"],
@@ -36,7 +52,7 @@
         "#\\s*renovate:\\s*datasource=(?<datasource>[^\\s]+)\\s+depName=(?<depName>[^\\s]+)\\s*\\n\\s*version:\\s*\"(?<currentValue>[^\"]+)\""
       ],
       "datasourceTemplate": "{{{datasource}}}",
-      "depNameTemplate": "{{{depName}}}",
+      "depNameTemplate": "{{{depName}}}"
     }
-  ],
+  ]
 }
