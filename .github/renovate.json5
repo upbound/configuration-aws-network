@@ -71,4 +71,7 @@
       depNameTemplate: '{{{depName}}}',
     },
   ],
+  "git-submodules": {
+     "enabled": true
+  }
 }

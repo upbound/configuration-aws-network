@@ -117,11 +117,11 @@ PLATFORMS ?= linux_amd64
 
 # Tool Versions
 # ------------------
-UP_VERSION = v0.34.0
+UP_VERSION = v0.35.0
 UP_CHANNEL = stable
-CROSSPLANE_CLI_VERSION = v1.17.1
-CROSSPLANE_VERSION = v1.17.1-up.1
-UPTEST_VERSION = v1.1.2
+CROSSPLANE_CLI_VERSION = v1.18.0
+CROSSPLANE_VERSION = v1.18.0-up.1
+UPTEST_VERSION = v1.2.0
 
 # Crossplane Configuration
 # ------------------
