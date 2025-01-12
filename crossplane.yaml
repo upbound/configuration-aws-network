@@ -18,7 +18,7 @@ spec:
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-aws-ec2
       # renovate: datasource=github-releases depName=upbound/provider-aws
-      version: "v1.18.0"
+      version: "v1.19.0"
     - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
       # renovate: datasource=github-releases depName=crossplane-contrib/function-auto-ready
       version: "v0.4.0"
@@ -27,4 +27,4 @@ spec:
       version: "v0.9.0"
     - function: xpkg.upbound.io/crossplane-contrib/function-kcl
       # renovate: datasource=github-releases depName=crossplane-contrib/function-kcl
-      version: "v0.10.9"
+      version: "v0.11.0"
