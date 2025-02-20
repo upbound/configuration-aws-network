@@ -26,4 +26,4 @@ spec:
       version: "v0.9.1"
     - function: xpkg.upbound.io/crossplane-contrib/function-kcl
       # renovate: datasource=github-releases depName=crossplane-contrib/function-kcl
-      version: "v0.11.1"
+      version: "v0.11.2"
