@@ -1,14 +1,8 @@
 apiVersion: aws.platform.upbound.io/v1alpha1
 kind: XNetwork
 metadata:
-  name: configuration-aws-network-gotpl
-  annotations:
-    render.crossplane.io/composition-path: apis/gotpl/composition.yaml
-    render.crossplane.io/function-path: examples/functions.yaml
+  name: configuration-aws-network
 spec:
-  compositionSelector:
-    matchLabels:
-      function: go-templating
   parameters:
     id: configuration-aws-network
     region: us-west-2
