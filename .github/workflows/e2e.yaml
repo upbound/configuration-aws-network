@@ -33,7 +33,7 @@ jobs:
         run: up project build
 
       - name: Switch up context
-        run: up ctx ${{ secrets.UP_ORG }}/upbound-gcp-us-central-1/default
+        run: up ctx ${{ secrets.UP_ORG }}/upbound-gcp-us-central-1/${{ secrets.UP_GROUP }}
 
       - name: Download and install Upbound-enhanced Chainsaw(remove me later)
         run: |
