@@ -12,7 +12,7 @@ on:
 env:
   UP_API_TOKEN: ${{ secrets.UP_E2E_API_TOKEN || secrets.UP_API_TOKEN }}
   UP_ORG: ${{ secrets.UP_E2E_ORG || secrets.UP_ORG }}
-  UP_GROUP: ${{ secrets.UP_E2E_GROUP || secrets.UP_GROUP || "default" }}
+  UP_GROUP: ${{ secrets.UP_E2E_GROUP || secrets.UP_GROUP || 'default' }}
   UP_ROBOT_ID: ${{ secrets.UP_E2E_ROBOT_ID || secrets.UP_ROBOT_ID }}
 
 jobs:
