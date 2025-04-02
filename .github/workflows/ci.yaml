@@ -13,6 +13,7 @@ on:
 
 env:
   UP_API_TOKEN: ${{ secrets.UP_API_TOKEN }}
+  UP_ROBOT_ID: ${{ secrets.UP_ROBOT_ID }}
   UP_ORG: ${{ secrets.UP_ORG }}
 
 jobs:
