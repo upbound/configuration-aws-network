@@ -45,10 +45,5 @@ jobs:
       - name: Switch up context
         run: up ctx ${{ env.UP_ORG }}/upbound-gcp-us-central-1/${{ env.UP_GROUP }}
 
-      - name: Download and install Upbound-enhanced Chainsaw(remove me later)
-        run: |
-          curl -L -o /usr/local/bin/chainsaw https://yurychainsaw.blob.core.windows.net/chainsaw/chainsaw
-          chmod +x /usr/local/bin/chainsaw
-
       - name: Run e2e tests
         run: up test run tests/* --e2e
