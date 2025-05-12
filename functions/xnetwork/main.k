@@ -36,6 +36,7 @@ _getExternalName = lambda resourceName = str -> str {
 }
 
 vpcId = option("params")?.ocds?.vpc?.Resource?.status?.atProvider?.id or False
+securityGroupId: str = option("params")?.ocds?["sg"]?.Resource?.status?.atProvider?.id or ""
 
 createdSubnets = [
     createdSubnet
@@ -52,17 +53,6 @@ createdSubnets = [
             for s in oxr.spec.parameters.subnets
         ]
     ] if createdSubnet.id != None
-]
-
-securityGroupIds = [
-    sgId
-    for sgId in [
-        _getExternalName(sgResource)
-        for sgResource in [
-            "sg-" + _formatSubnet(s)
-            for s in oxr.spec.parameters.subnets
-        ]
-    ] if sgId != None
 ]
 
 _items = [
@@ -289,7 +279,7 @@ _items = [
             subnetIds = [s.id for s in createdSubnets]
             publicSubnetIds = [s.id for s in createdSubnets if s.type == "public"]
             privateSubnetIds = [s.id for s in createdSubnets if s.type == "private"]
-            securityGroupIds = securityGroupIds
+            securityGroupIds = [securityGroupId]
         }
         spec = {
             parameters = {
