@@ -1,5 +1,4 @@
-import models.io.upbound.aws.ec2.v1beta2 as ec2v1beta2
-import models.io.upbound.aws.ec2.v1beta1 as ec2v1beta1
+import models.io.upbound.awsm.ec2.v1beta1 as mec2v1beta1
 import models.io.upbound.platform.aws.v1alpha1 as platformawsv1alpha1
 
 import regex
@@ -9,18 +8,12 @@ _ocds = option("params").ocds
 _dxr = option("params").dxr
 dcds = option("params").dcds
 
-providerConfigRefName = oxr.spec.parameters.providerConfigName or None
+params = oxr.spec.parameters    # extract parameter values from XR
 
 _metadata = lambda name = str -> any {
     {
         annotations = {"krm.kcl.dev/composition-resource-name" = name}
     }
-}
-
-_defaults = {
-    deletionPolicy = option("params")?.oxr?.spec.parameters.deletionPolicy or "Delete"
-    if providerConfigRefName:
-        providerConfigRef.name = providerConfigRefName
 }
 
 _cidrEscaped = lambda cidr = str -> str {
@@ -50,50 +43,48 @@ createdSubnets = [
                 name = "subnet-" + _formatSubnet(s)
                 type = s.type
             }
-            for s in oxr.spec.parameters.subnets
+            for s in params.subnets
         ]
     ] if createdSubnet.id != None
 ]
 
 _items = [
-    ec2v1beta1.VPC{
+    mec2v1beta1.VPC {
         metadata = _metadata("vpc") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
-                cidrBlock = oxr.spec.parameters.vpcCidrBlock
+                cidrBlock = params.vpcCidrBlock
                 enableDnsHostnames = True
                 enableDnsSupport = True
                 tags = {
                     Name = oxr.metadata.name
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 
-    ec2v1beta1.InternetGateway{
-        apiVersion = "ec2.aws.upbound.io/v1beta1"
-        kind = "InternetGateway"
+    mec2v1beta1.InternetGateway {
         metadata = _metadata("igw") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 ] + [
-    ec2v1beta1.Subnet{
+    mec2v1beta1.Subnet {
         metadata = _metadata("subnet-" + _formatSubnet(s)) | {
             labels = {
                 zone = s.availabilityZone
@@ -101,10 +92,10 @@ _items = [
                     access = "private"
                 else:
                     access = "public"
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 cidrBlock = s.cidrBlock
                 if s.type == "public":
@@ -114,26 +105,26 @@ _items = [
                         "kubernetes.io/role/internal-elb" = "1"
                     else:
                         "kubernetes.io/role/elb" = "1"
-                        "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                        "networks.aws.platform.upbound.io/network-id" = params.id
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
                 availabilityZone = s.availabilityZone
             }
         }
-    } for s in oxr.spec.parameters.subnets
+    } for s in params.subnets
 ] + [
-    ec2v1beta1.RouteTableAssociation{
+    mec2v1beta1.RouteTableAssociation {
         metadata = _metadata("rta-" + _formatSubnet(s)) | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
-                region = oxr.spec.parameters.region
+                region = params.region
                 routeTableIdSelector = {
                     matchControllerRef = True
                 }
@@ -149,31 +140,31 @@ _items = [
                 }
             }
         }
-    } for s in oxr.spec.parameters.subnets
+    } for s in params.subnets
 ] + [
-    ec2v1beta1.RouteTable{
+    mec2v1beta1.RouteTable {
         metadata = _metadata("rt") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 ] + [
-    ec2v1beta2.Route{
+    mec2v1beta1.Route {
         metadata = _metadata("route") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 destinationCidrBlock = "0.0.0.0/0"
                 gatewayIdSelector = {
@@ -182,18 +173,18 @@ _items = [
                 routeTableIdSelector = {
                     matchControllerRef = True
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 ] + [
-    ec2v1beta1.MainRouteTableAssociation{
+    mec2v1beta1.MainRouteTableAssociation {
         metadata = _metadata("mrt") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 routeTableIdSelector = {
                     matchControllerRef = True
@@ -201,36 +192,36 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 ] + [
-    ec2v1beta1.SecurityGroup{
+    mec2v1beta1.SecurityGroup {
         metadata = _metadata("sg") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 description = "Allow access to databases"
                 name = "platform-ref-aws-cluster"
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
    }
 ] + [
-    ec2v1beta1.SecurityGroupRule{
+    mec2v1beta1.SecurityGroupRule {
         metadata = _metadata("sgr-postgres") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 cidrBlocks = [
                     "0.0.0.0/0"
@@ -243,18 +234,18 @@ _items = [
                 }
                 toPort = 5432
                 type = "ingress"
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 ] + [
-    ec2v1beta1.SecurityGroupRule{
+    mec2v1beta1.SecurityGroupRule {
         metadata = _metadata("sgr-mysql") | {
             labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                "networks.aws.platform.upbound.io/network-id" = params.id
             }
         }
-        spec = _defaults | {
+        spec = {
             forProvider = {
                 cidrBlocks = [
                     "0.0.0.0/0"
@@ -267,12 +258,12 @@ _items = [
                 }
                 toPort = 3306
                 type = "ingress"
-                region = oxr.spec.parameters.region
+                region = params.region
             }
         }
     }
 ] + [
-    platformawsv1alpha1.XNetwork{
+    platformawsv1alpha1.XNetwork {
         status = {
             if vpcId:
                 vpcId = vpcId
@@ -283,8 +274,8 @@ _items = [
         }
         spec = {
             parameters = {
-                id = oxr.spec.parameters.id
-                region = oxr.spec.parameters.region
+                id = params.id
+                region = params.region
             }
         }
     }

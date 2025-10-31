@@ -7,6 +7,7 @@ spec:
   names:
     kind: XNetwork
     plural: xnetworks
+  scope: Namespaced
   versions:
     - name: v1alpha1
       served: true
@@ -27,13 +28,6 @@ spec:
                     region:
                       type: string
                       description: Region is the region you'd like your resource to be created in.
-                    deletionPolicy:
-                      description: Delete the external resources when the Claim/XR is deleted. Defaults to Delete
-                      enum:
-                        - Delete
-                        - Orphan
-                      type: string
-                      default: Delete
                     providerConfigName:
                       description: Crossplane ProviderConfig to use for provisioning this resources
                       type: string
@@ -75,7 +69,6 @@ spec:
                           type: private
                           cidrBlock: 192.168.192.0/18
                   required:
-                    - deletionPolicy
                     - providerConfigName
                     - id
                     - region
