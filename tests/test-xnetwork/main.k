@@ -1,8 +1,16 @@
-import models.io.upbound.aws.ec2.v1beta1 as ec2v1beta1
-import models.io.upbound.aws.ec2.v1beta2 as ec2v1beta2
+import models.io.upbound.awsm.ec2.v1beta1 as mec2v1beta1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.aws.v1alpha1 as platformawsv1alpha1
 
+# It's a best practice for composition functions to return only fields whose
+# values they care about, since they become the owner of any field they
+# return. Allow for fields with defaults to be omitted by the composition
+# function by clearing them in our expected resources.
+_stripDefaults = lambda obj: any -> any {
+    obj | {
+        spec.managementPolicies = Undefined
+    }
+}
 
 _items = [
     metav1alpha1.CompositionTest{
@@ -18,7 +26,7 @@ _items = [
                         region = "us-west-2"
                     }
                 }
-                ec2v1beta1.SecurityGroup{
+                _stripDefaults(mec2v1beta1.SecurityGroup {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "sg"
@@ -40,7 +48,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             description = "Allow access to databases"
                             name = "platform-ref-aws-cluster"
@@ -53,8 +60,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.SecurityGroupRule{
+                })
+                _stripDefaults(mec2v1beta1.SecurityGroupRule {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "sgr-mysql"
@@ -76,7 +83,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             cidrBlocks = [
                                 "0.0.0.0/0"
@@ -95,8 +101,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.SecurityGroupRule{
+                })
+                _stripDefaults(mec2v1beta1.SecurityGroupRule {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "sgr-postgres"
@@ -118,7 +124,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             cidrBlocks = [
                                 "0.0.0.0/0"
@@ -137,8 +142,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.Subnet{
+                })
+                _stripDefaults(mec2v1beta1.Subnet {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "subnet-us-west-2a-192-168-0-0-18-public"
@@ -162,7 +167,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2a"
                             cidrBlock = "192.168.0.0/18"
@@ -180,8 +184,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.Subnet{
+                })
+                _stripDefaults(mec2v1beta1.Subnet {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "subnet-us-west-2a-192-168-128-0-18-private"
@@ -205,7 +209,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2a"
                             cidrBlock = "192.168.128.0/18"
@@ -221,10 +224,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.Subnet{
-                    apiVersion = "ec2.aws.upbound.io/v1beta1"
-                    kind = "Subnet"
+                })
+                _stripDefaults(mec2v1beta1.Subnet {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "subnet-us-west-2b-192-168-192-0-18-private"
@@ -248,7 +249,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2b"
                             cidrBlock = "192.168.192.0/18"
@@ -264,8 +264,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.Subnet{
+                })
+                _stripDefaults(mec2v1beta1.Subnet {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "subnet-us-west-2b-192-168-64-0-18-public"
@@ -289,7 +289,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2b"
                             cidrBlock = "192.168.64.0/18"
@@ -307,8 +306,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.VPC{
+                })
+                _stripDefaults(mec2v1beta1.VPC {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "vpc"
@@ -330,7 +329,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             cidrBlock = "192.168.0.0/16"
                             enableDnsHostnames = True
@@ -344,8 +342,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.InternetGateway{
+                })
+                _stripDefaults(mec2v1beta1.InternetGateway {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "igw"
@@ -367,7 +365,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             vpcIdSelector = {
@@ -378,8 +375,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.MainRouteTableAssociation{
+                })
+                _stripDefaults(mec2v1beta1.MainRouteTableAssociation {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "mrt"
@@ -401,7 +398,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -415,8 +411,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta2.Route{
+                })
+                _stripDefaults(mec2v1beta1.Route {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "route"
@@ -438,7 +434,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             destinationCidrBlock = "0.0.0.0/0"
                             gatewayIdSelector = {
@@ -453,8 +448,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.RouteTable{
+                })
+                _stripDefaults(mec2v1beta1.RouteTable {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "rt"
@@ -476,7 +471,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             vpcIdSelector = {
@@ -487,8 +481,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.RouteTableAssociation{
+                })
+                _stripDefaults(mec2v1beta1.RouteTableAssociation {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "rta-us-west-2a-192-168-0-0-18-public"
@@ -510,7 +504,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -528,8 +521,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.RouteTableAssociation{
+                })
+                _stripDefaults(mec2v1beta1.RouteTableAssociation {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "rta-us-west-2a-192-168-128-0-18-private"
@@ -551,7 +544,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -569,8 +561,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.RouteTableAssociation{
+                })
+                _stripDefaults(mec2v1beta1.RouteTableAssociation {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "rta-us-west-2b-192-168-192-0-18-private"
@@ -592,7 +584,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -610,8 +601,8 @@ _items = [
                             "*"
                         ]
                     }
-                }
-                ec2v1beta1.RouteTableAssociation{
+                })
+                _stripDefaults(mec2v1beta1.RouteTableAssociation {
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "rta-us-west-2b-192-168-64-0-18-public"
@@ -633,7 +624,6 @@ _items = [
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -651,7 +641,7 @@ _items = [
                             "*"
                         ]
                     }
-                }
+                })
             ]
             compositionPath: "apis/xnetworks/composition.yaml"
             xrPath: "examples/xnetworks/configuration-aws-network.yaml"
