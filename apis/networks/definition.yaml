@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: xnetworks.aws.platform.upbound.io
+  name: networks.aws.platform.upbound.io
 spec:
-  scope: Cluster
+  scope: Namespaced
   group: aws.platform.upbound.io
   names:
-    kind: XNetwork
-    plural: xnetworks
+    kind: Network
+    plural: networks
   versions:
     - name: v1alpha1
       served: true
@@ -28,13 +28,18 @@ spec:
                     region:
                       type: string
                       description: Region is the region you'd like your resource to be created in.
-                    deletionPolicy:
-                      description: Delete the external resources when the Claim/XR is deleted. Defaults to Delete
-                      enum:
-                        - Delete
-                        - Orphan
-                      type: string
-                      default: Delete
+                    managementPolicies:
+                      description: ManagementPolicies for AWS EC2 resources. Defaults to ["*"] which includes all operations (Create, Observe, Update, Delete). To orphan resources on deletion, use ["Create", "Observe", "Update"].
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                          - "*"
+                          - Create
+                          - Observe
+                          - Update
+                          - Delete
+                      default: ["*"]
                     providerConfigName:
                       description: Crossplane ProviderConfig to use for provisioning this resources
                       type: string
@@ -76,7 +81,7 @@ spec:
                           type: private
                           cidrBlock: 192.168.192.0/18
                   required:
-                    - deletionPolicy
+                    - managementPolicies
                     - providerConfigName
                     - id
                     - region
