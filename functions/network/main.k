@@ -1,10 +1,10 @@
-import models.io.upbound.aws.ec2.v1beta2 as ec2v1beta2
-import models.io.upbound.aws.ec2.v1beta1 as ec2v1beta1
+import models.io.upbound.awsm.ec2.v1beta2 as ec2v1beta2
+import models.io.upbound.awsm.ec2.v1beta1 as ec2v1beta1
 import models.io.upbound.platform.aws.v1alpha1 as platformawsv1alpha1
 
 import regex
 
-oxr = platformawsv1alpha1.XNetwork{**option("params").oxr}
+oxr = platformawsv1alpha1.Network{**option("params").oxr}
 _ocds = option("params").ocds
 _dxr = option("params").dxr
 dcds = option("params").dcds
@@ -18,9 +18,12 @@ _metadata = lambda name = str -> any {
 }
 
 _defaults = {
-    deletionPolicy = option("params")?.oxr?.spec.parameters.deletionPolicy or "Delete"
+    managementPolicies = option("params")?.oxr?.spec.parameters.managementPolicies or ["*"]
     if providerConfigRefName:
-        providerConfigRef.name = providerConfigRefName
+        providerConfigRef = {
+            kind = "ProviderConfig"
+            name = providerConfigRefName
+        }
 }
 
 _cidrEscaped = lambda cidr = str -> str {
@@ -76,8 +79,6 @@ _items = [
     }
 
     ec2v1beta1.InternetGateway{
-        apiVersion = "ec2.aws.upbound.io/v1beta1"
-        kind = "InternetGateway"
         metadata = _metadata("igw") | {
             labels = {
                 "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
@@ -167,7 +168,7 @@ _items = [
         }
     }
 ] + [
-    ec2v1beta2.Route{
+    ec2v1beta1.Route{
         metadata = _metadata("route") | {
             labels = {
                 "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
@@ -272,7 +273,7 @@ _items = [
         }
     }
 ] + [
-    platformawsv1alpha1.XNetwork{
+    platformawsv1alpha1.Network{
         status = {
             if vpcId:
                 vpcId = vpcId

@@ -26,9 +26,9 @@ In this specific configuration, the AWS Network API contains:
 
 The configuration can be tested using:
 
-- `up composition render --xrd=apis/xnetworks/definition.yaml apis/xnetworks/composition.yaml examples/network-xr.yaml` to render the composition
-- `up test run tests/*` to run composition tests in `tests/test-xnetwork/`
-- `up test run tests/* --e2e` to run end-to-end tests in `tests/e2etest-xnetwork/`
+- `up composition render --xrd=apis/networks/definition.yaml apis/networks/composition.yaml examples/networks/configuration-aws-network.yaml` to render the composition
+- `up test run tests/*` to run composition tests in `tests/test-network/`
+- `up test run tests/* --e2e` to run end-to-end tests in `tests/e2etest-network`
 
 ## Next steps
 
