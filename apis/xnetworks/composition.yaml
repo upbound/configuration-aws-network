@@ -9,8 +9,18 @@ spec:
   mode: Pipeline
   pipeline:
   - functionRef:
-      name: upbound-configuration-aws-networkxnetwork
-    step: xnetwork
+      name: solutions-configuration-aws-networkxnetwork
+    step: network
   - functionRef:
       name: crossplane-contrib-function-auto-ready
     step: crossplane-contrib-function-auto-ready
+  - step: external-name-backup
+    functionRef:
+      name: solutions-function-external-name-backup-restore
+    credentials:
+    - name: aws-creds
+      source: Secret
+      secretRef:
+        namespace: crossplane-system
+        name: aws-dynamodb-creds
+        key: credentials

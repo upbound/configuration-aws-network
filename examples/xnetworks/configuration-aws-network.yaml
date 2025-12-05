@@ -2,9 +2,18 @@ apiVersion: aws.platform.upbound.io/v1alpha1
 kind: XNetwork
 metadata:
   name: configuration-aws-network
+  namespace: network-team
+  annotations:
+    fn.crossplane.io/enable-external-store: "true"
+    fn.crossplane.io/cluster-id: "migration-poc"
+    fn.crossplane.io/store-type: "k8sconfigmap"
+    fn.crossplane.io/dynamodb-table: "external-name-backup"
+    fn.crossplane.io/dynamodb-region: "us-west-2"
+    fn.crossplane.io/backup-scope: "orphaned"
 spec:
   parameters:
     id: configuration-aws-network
+    deletionPolicy: Orphan
     region: us-west-2
     vpcCidrBlock: 192.168.0.0/16
     subnets:
