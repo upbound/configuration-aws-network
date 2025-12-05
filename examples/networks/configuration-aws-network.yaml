@@ -3,8 +3,24 @@ kind: Network
 metadata:
   name: configuration-aws-network
   namespace: network-team
+  annotations:
+    fn.crossplane.io/enable-external-store: "true"
+    fn.crossplane.io/cluster-id: "migration-poc"
+    fn.crossplane.io/store-type: "k8sconfigmap"
+    fn.crossplane.io/dynamodb-table: "external-name-backup"
+    fn.crossplane.io/dynamodb-region: "us-west-2"
+    fn.crossplane.io/operation-mode: "only-orphaned"
+    fn.crossplane.io/override-kind: "XNetwork"
+    fn.crossplane.io/override-namespace: "none"
+    fn.crossplane.io/require-restore: "true"
 spec:
   parameters:
+    managementPolicies:
+      - Delete
+      - Create
+      - Update
+      - Observe
+      - LateInitialize
     id: configuration-aws-network
     region: us-west-2
     vpcCidrBlock: 192.168.0.0/16

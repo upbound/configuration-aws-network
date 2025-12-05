@@ -10,6 +10,10 @@ spec:
     version: v2
   - apiVersion: pkg.crossplane.io/v1
     kind: Function
+    package: xpkg.upbound.io/solutions/function-external-name-backup-restore
+    version: v0.1.0
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Function
     package: xpkg.upbound.io/crossplane-contrib/function-auto-ready
     version: '>=v0.0.0'
   description: This configuration provides a foundation to build and operate AWS networks.
@@ -18,5 +22,5 @@ spec:
   readme: |
     This configuration is used for deploying and managing AWS network clusters on Kubernetes using Crossplane. This setup provides the necessary infrastructure to deploy AWS network managed with Crossplane in Kubernetes. This approach ensures a flexible, streamlined deployment workflow.
      For more details and customization options, you can explore [the GitHub repository](https://github.com/upbound/configuration-aws-network).
-  repository: xpkg.upbound.io/upbound/configuration-aws-network
+  repository: xpkg.upbound.io/solutions/configuration-aws-network
   source: github.com/upbound/configuration-aws-network
