@@ -1,12 +1,16 @@
-apiVersion: meta.dev.upbound.io/v1alpha1
+apiVersion: meta.dev.upbound.io/v2alpha1
 kind: Project
 metadata:
   name: configuration-aws-network
 spec:
   dependsOn:
-  - provider: xpkg.upbound.io/upbound/provider-aws-ec2
-    version: "v1"
-  - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Provider
+    package: xpkg.upbound.io/upbound/provider-aws-ec2
+    version: '>=v2.3.0'
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Function
+    package: xpkg.upbound.io/crossplane-contrib/function-auto-ready
     version: '>=v0.0.0'
   description: This configuration provides a foundation to build and operate AWS networks.
   license: Apache-2.0

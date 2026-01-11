@@ -1,5 +1,4 @@
-import models.io.upbound.aws.ec2.v1beta1 as ec2v1beta1
-import models.io.upbound.aws.ec2.v1beta2 as ec2v1beta2
+import models.io.upbound.awsm.ec2.v1beta1 as ec2v1beta1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.aws.v1alpha1 as platformawsv1alpha1
 
@@ -9,9 +8,10 @@ _items = [
         metadata.name: "test-xnetwork"
         spec= {
             assertResources: [
-                platformawsv1alpha1.XNetwork{
+                platformawsv1alpha1.Network{
                     metadata = {
                         name = "configuration-aws-network"
+                        namespace = "default"
                     }
                     spec.parameters = {
                         id = "configuration-aws-network"
@@ -33,14 +33,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             description = "Allow access to databases"
                             name = "platform-ref-aws-cluster"
@@ -69,14 +68,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             cidrBlocks = [
                                 "0.0.0.0/0"
@@ -111,14 +109,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             cidrBlocks = [
                                 "0.0.0.0/0"
@@ -155,14 +152,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2a"
                             cidrBlock = "192.168.0.0/18"
@@ -198,14 +194,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2a"
                             cidrBlock = "192.168.128.0/18"
@@ -223,8 +218,6 @@ _items = [
                     }
                 }
                 ec2v1beta1.Subnet{
-                    apiVersion = "ec2.aws.upbound.io/v1beta1"
-                    kind = "Subnet"
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "subnet-us-west-2b-192-168-192-0-18-private"
@@ -241,14 +234,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2b"
                             cidrBlock = "192.168.192.0/18"
@@ -282,14 +274,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             availabilityZone = "us-west-2b"
                             cidrBlock = "192.168.64.0/18"
@@ -323,14 +314,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             cidrBlock = "192.168.0.0/16"
                             enableDnsHostnames = True
@@ -360,14 +350,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             vpcIdSelector = {
@@ -394,14 +383,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -416,7 +404,7 @@ _items = [
                         ]
                     }
                 }
-                ec2v1beta2.Route{
+                ec2v1beta1.Route{
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "route"
@@ -431,14 +419,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             destinationCidrBlock = "0.0.0.0/0"
                             gatewayIdSelector = {
@@ -469,14 +456,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             vpcIdSelector = {
@@ -503,14 +489,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -544,14 +529,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -585,14 +569,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -626,14 +609,13 @@ _items = [
                                 apiVersion = "aws.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XNetwork"
+                                kind = "Network"
                                 name = "configuration-aws-network"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Delete"
                         forProvider = {
                             region = "us-west-2"
                             routeTableIdSelector = {
@@ -653,9 +635,9 @@ _items = [
                     }
                 }
             ]
-            compositionPath: "apis/xnetworks/composition.yaml"
-            xrPath: "examples/xnetworks/configuration-aws-network.yaml"
-            xrdPath: "apis/xnetworks/definition.yaml"
+            compositionPath: "apis/networks/composition.yaml"
+            xrPath: "examples/networks/configuration-aws-network.yaml"
+            xrdPath: "apis/networks/definition.yaml"
             timeoutSeconds: 60
             validate: False
         }
