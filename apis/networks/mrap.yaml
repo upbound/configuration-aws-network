@@ -1,0 +1,15 @@
+apiVersion: apiextensions.crossplane.io/v1alpha1
+kind: ManagedResourceActivationPolicy
+metadata:
+  name: configuration-aws-network
+spec:
+  activate:
+  - internetgateways.ec2.aws.m.upbound.io
+  - mainroutetableassociations.ec2.aws.m.upbound.io
+  - routes.ec2.aws.m.upbound.io
+  - routetableassociations.ec2.aws.m.upbound.io
+  - routetables.ec2.aws.m.upbound.io
+  - securitygrouprules.ec2.aws.m.upbound.io
+  - securitygroups.ec2.aws.m.upbound.io
+  - subnets.ec2.aws.m.upbound.io
+  - vpcs.ec2.aws.m.upbound.io

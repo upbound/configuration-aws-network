@@ -22,6 +22,15 @@ In this specific configuration, the AWS Network API contains:
 - Alternatively, install the Configuration from the [Upbound Marketplace](https://marketplace.upbound.io/configurations/upbound/configuration-aws-network)
 - Check [examples](/examples/) for example XR(Composite Resource)
 
+## Managed Resource Activation Policy
+
+This configuration includes a `ManagedResourceActivationPolicy` (MRAP) that enables only the required CRDs from dependent providers. If you're running Crossplane without a default activation policy, this ensures that only the necessary CRDs are activated, reducing resource overhead and improving control plane performance.
+
+To view the MRAP:
+```bash
+kubectl get managedresourceactivationpolicy configuration-aws-network -o yaml
+```
+
 ## Testing
 
 The configuration can be tested using:
