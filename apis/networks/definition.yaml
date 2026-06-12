@@ -21,94 +21,133 @@ spec:
               properties:
                 parameters:
                   description: Network Parameters
+                  type: object
                   properties:
                     id:
                       type: string
-                      description: ID of this Network that other objects will use to refer to it.
+                      description: >-
+                        Platform identifier for this network. Sibling composites
+                        (Compute, DataStore, Ingress) reference the network by
+                        this id — never by cloud resource ids.
                     region:
                       type: string
-                      description: Region is the region you'd like your resource to be created in.
-                    managementPolicies:
-                      description: ManagementPolicies for AWS EC2 resources. Defaults to ["*"] which includes all operations (Create, Observe, Update, Delete, LateInitialize). To orphan resources on deletion, use ["Create", "Observe", "Update", "LateInitialize"].
-                      type: array
-                      items:
+                      description: Cloud region, e.g. us-west-2.
+                    availabilityZones:
+                      type: integer
+                      minimum: 1
+                      maximum: 6
+                      default: 3
+                      description: >-
+                        Number of AZs to span. The composition computes the
+                        subnet plan; adding an AZ is a field change, not a
+                        consumer-side CIDR exercise.
+                    cidrBlock:
+                      type: string
+                      pattern: '^([0-9]{1,3}\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$'
+                      default: "10.0.0.0/16"
+                      description: >-
+                        Address space for the network. The composition subdivides
+                        it: with public-private, the lower half hosts the public
+                        tier and the upper half the private tier, each split
+                        evenly across AZs.
+                    subnetStrategy:
+                      type: string
+                      enum: [public-private, private-only, public-only]
+                      default: public-private
+                    natGateway:
+                      type: string
+                      enum: [per-az, single, none]
+                      default: single
+                      description: >-
+                        Egress strategy for private subnets. per-az gives each
+                        zone an independent egress path (losing one AZ does not
+                        impair the others — static stability as a consumer
+                        choice); single trades that for cost; none means no
+                        internet egress (pair with VPC endpoints). Ignored for
+                        public-only.
+                    dnsSupport:
+                      type: boolean
+                      default: true
+                    dnsHostnames:
+                      type: boolean
+                      default: true
+                    defaultSecurityPolicy:
+                      type: string
+                      enum: [restrictive, permissive]
+                      default: restrictive
+                      description: >-
+                        restrictive creates the network security group with no
+                        ingress rules — workloads bring their own. permissive
+                        allows all traffic originating within the network CIDR
+                        (development convenience). The network layer defines NO
+                        service-specific rules; database/app access is requested
+                        by those domains against this network's contract.
+                    tags:
+                      type: object
+                      additionalProperties:
                         type: string
-                        enum:
-                          - "*"
-                          - Create
-                          - Observe
-                          - Update
-                          - Delete
-                          - LateInitialize
-                      default: ["*"]
-                    providerConfigName:
-                      description: Crossplane ProviderConfig to use for provisioning this resources
+                      description: Merged into every resource this network creates.
+                    reclaimPolicy:
                       type: string
-                      default: default
-                    vpcCidrBlock:
-                      type: string
-                      description: CIDR block for the VPC
-                      default: 192.168.0.0/16
-                    subnets:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          availabilityZone:
+                      enum: [Delete, Retain]
+                      default: Delete
+                      description: >-
+                        Outcome intent, using the Kubernetes PersistentVolume
+                        vocabulary. Retain leaves cloud resources in place when
+                        this composite is deleted (production networks). The
+                        mapping to Crossplane management policies is an
+                        implementation detail owned by the composition — the
+                        field deliberately does NOT echo any Crossplane
+                        machinery, past or present.
+                    overrides:
+                      type: object
+                      description: >-
+                        Bounded escape hatch with an explicit support boundary.
+                        Exists so operational edge cases have a sanctioned
+                        outlet instead of forcing leaks into the primary
+                        contract.
+                      properties:
+                        availabilityZoneNames:
+                          type: array
+                          items:
                             type: string
-                          type:
-                            type: string
-                            enum:
-                              - public
-                              - private
-                          cidrBlock:
-                            type: string
-                      description: Subnets to create in the VPC
-                      required:
-                        - availabilityZone
-                        - type
-                        - cidrBlock
-                      default:
-                        - availabilityZone: us-west-2a
-                          type: public
-                          cidrBlock: 192.168.0.0/18
-                        - availabilityZone: us-west-2b
-                          type: public
-                          cidrBlock: 192.168.64.0/18
-                        - availabilityZone: us-west-2a
-                          type: private
-                          cidrBlock: 192.168.128.0/18
-                        - availabilityZone: us-west-2b
-                          type: private
-                          cidrBlock: 192.168.192.0/18
+                          description: >-
+                            Explicit AZ names, overriding the derived
+                            region+suffix list (for regions with non-contiguous
+                            AZ lettering or capacity constraints). Length must
+                            equal availabilityZones.
+                        providerConfigName:
+                          type: string
+                          description: >-
+                            Crossplane ProviderConfig for account/credential
+                            selection. Defaults to "default".
                   required:
-                    - managementPolicies
-                    - providerConfigName
                     - id
                     - region
-                    - subnets
-                    - vpcCidrBlock
-                  type: object
               required:
                 - parameters
             status:
               type: object
               properties:
-                vpcId:
+                networkId:
                   type: string
-                subnetIds:
-                  type: array
-                  items:
-                    type: string
+                  description: Cloud network identifier (vpc-...).
                 publicSubnetIds:
                   type: array
-                  items:
-                    type: string
+                  items: { type: string }
                 privateSubnetIds:
                   type: array
-                  items:
-                    type: string
+                  items: { type: string }
+                subnetIds:
+                  type: array
+                  items: { type: string }
+                  description: All subnet ids (legacy-status-compatible union).
                 securityGroupIds:
                   type: array
-                  items:
-                    type: string
+                  items: { type: string }
+                availabilityZoneNames:
+                  type: array
+                  items: { type: string }
+                  description: Resolved AZ names, for sibling AZ alignment.
+                cidrBlock:
+                  type: string
