@@ -1,0 +1,15 @@
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: Network
+metadata:
+  namespace: default
+  name: isolated-network
+spec:
+  parameters:
+    region: us-east-1
+    availabilityZones: 3
+    cidrBlock: "10.2.0.0/16"
+    subnetStrategy: private-only
+    natGateway: none              # no egress; pair with VPC endpoints
+    reclaimPolicy: Delete
+    tags:
+      compliance: hipaa

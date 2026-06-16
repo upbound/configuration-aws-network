@@ -24,7 +24,7 @@ params = oxr.spec.parameters
 # -----------------------------------------------------------------------------
 # Inputs (XRD defaults guard most of these; `or` fallbacks keep render safe)
 # -----------------------------------------------------------------------------
-_id = params.id
+_name = oxr.metadata.name
 _region = params.region
 _azCount = params.availabilityZones or 3
 _cidr = params.cidrBlock or "10.0.0.0/16"
@@ -36,7 +36,7 @@ _reclaimPolicy = params.reclaimPolicy or "Delete"
 _providerConfigName = params.overrides?.providerConfigName or "default"
 _azOverride = params.overrides?.availabilityZoneNames or []
 
-_networkIdTag = "networks.network.platform.upbound.io/network-id"
+_networkLabel = "networks.network.platform.upbound.io/network"
 
 # reclaimPolicy intent (PV vocabulary) -> Crossplane v2 management policies
 # on the namespaced MRs. This mapping is the L3-owned translation: the
@@ -54,11 +54,11 @@ _defaults = {
 _metadata = lambda name: str -> any {
     {
         annotations = {"krm.kcl.dev/composition-resource-name" = name}
-        labels = {"{}".format(_networkIdTag) = _id}
+        labels = {"{}".format(_networkLabel) = _name}
     }
 }
 
-_baseTags = {"Name" = oxr.metadata.name, "{}".format(_networkIdTag) = _id} | _userTags
+_baseTags = {"Name" = oxr.metadata.name, "{}".format(_networkLabel) = _name} | _userTags
 
 # -----------------------------------------------------------------------------
 # AZ resolution: derived region suffixes, override escape hatch wins
@@ -69,10 +69,13 @@ _azs = _azOverride if len(_azOverride) == _azCount else [
 ]
 
 # -----------------------------------------------------------------------------
-# Subnet plan: pure CIDR math over the parent block
-#   two tiers  -> halves of the parent (public low, private high)
-#   one tier   -> whole parent
-#   each tier  -> split across next-power-of-two >= azCount
+# Reserved-slot address plan. For parent /P:
+#   public slot  = /(P+6), slot i at base + i * publicSlotSize   (i in 0..5)
+#                  internal reserve behind slot 5 up to the private region
+#   private slot = /(P+3), slot i at base + (1+i) * privateSlotSize
+#                  (private region starts one private-slot above base)
+#   reserved tail: base + 7 * privateSlotSize (future tiers)
+# Offsets are constants of the parent block — growth is always additive.
 # -----------------------------------------------------------------------------
 _ipToInt = lambda ip: str -> int {
     _p = [int(x) for x in ip.split(".")]
@@ -84,44 +87,52 @@ _intToIp = lambda n: int -> str {
 
 _parentBase = _ipToInt(_cidr.split("/")[0])
 _parentPrefix = int(_cidr.split("/")[1])
-_azBits = 0 if _azCount <= 1 else 1 if _azCount <= 2 else 2 if _azCount <= 4 else 3
-_tiers = ["public", "private"] if _strategy == "public-private" \
-    else ["public"] if _strategy == "public-only" else ["private"]
-_tierPrefix = _parentPrefix + (1 if len(_tiers) == 2 else 0)
-_tierSize = 2 ** (32 - _tierPrefix)
-_subPrefix = _tierPrefix + _azBits
-_subSize = 2 ** (32 - _subPrefix)
+_publicPrefix = _parentPrefix + 6
+_privatePrefix = _parentPrefix + 3
+_publicSlotSize = 2 ** (32 - _publicPrefix)
+_privateSlotSize = 2 ** (32 - _privatePrefix)
+
+_publicCidr = lambda i: int -> str {
+    "{}/{}".format(_intToIp(_parentBase + i * _publicSlotSize), _publicPrefix)
+}
+_privateCidr = lambda i: int -> str {
+    "{}/{}".format(_intToIp(_parentBase + (1 + i) * _privateSlotSize), _privatePrefix)
+}
+
+_hasPublic = _strategy in ["public-private", "public-only"]
+_hasPrivate = _strategy in ["public-private", "private-only"]
 
 _plan = [
     {
-        tier = _tiers[t]
-        az = _azs[a]
-        cidr = "{}/{}".format(_intToIp(_parentBase + t * _tierSize + a * _subSize), _subPrefix)
-        name = "subnet-{}-{}".format(_tiers[t], _azs[a])
-    }
-    for t in range(len(_tiers)) for a in range(_azCount)
+        tier = "public"
+        az = _azs[i]
+        cidr = _publicCidr(i)
+        name = "subnet-public-" + _azs[i]
+    } for i in range(_azCount) if _hasPublic
+] + [
+    {
+        tier = "private"
+        az = _azs[i]
+        cidr = _privateCidr(i)
+        name = "subnet-private-" + _azs[i]
+    } for i in range(_azCount) if _hasPrivate
 ]
 _publicPlan = [s for s in _plan if s.tier == "public"]
 _privatePlan = [s for s in _plan if s.tier == "private"]
 
 # NAT requires a public tier to live in; degrade to none otherwise
-_natCount = 0 if _natMode == "none" or len(_publicPlan) == 0 or len(_privatePlan) == 0 \
+_natCount = 0 if _natMode == "none" or not _hasPublic or not _hasPrivate \
     else _azCount if _natMode == "per-az" else 1
 _natAzs = _azs[0:_natCount]
 
 # -----------------------------------------------------------------------------
 # Observed state -> status inputs
 # -----------------------------------------------------------------------------
-_getExternalName = lambda resourceName: str -> str {
-    _ocds?[resourceName]?.Resource?.metadata?.annotations?["crossplane.io/external-name"] or None
+_observedId = lambda resName: str -> str {
+    _ocds?[resName]?.Resource?.status?.atProvider?.id or None
 }
-_vpcId = _ocds?.vpc?.Resource?.status?.atProvider?.id or False
-_sgId: str = _ocds?["sg"]?.Resource?.status?.atProvider?.id or ""
-_createdSubnets = [
-    s2 for s2 in [
-        {id = _getExternalName(s.name), tier = s.tier} for s in _plan
-    ] if s2.id != None
-]
+_vpcId = _observedId("vpc")
+_sgId = _observedId("sg")
 
 # =============================================================================
 # Resources
@@ -161,7 +172,7 @@ _subnets = [
             labels = {
                 zone = s.az
                 access = s.tier
-                "{}".format(_networkIdTag) = _id
+                "{}".format(_networkLabel) = _name
             }
         }
         spec = _defaults | {
@@ -191,7 +202,7 @@ _eips = [
         metadata = _metadata("eip-" + az) | {
             labels = {
                 "nat-zone" = az, 
-                "{}".format(_networkIdTag) = _id
+                "{}".format(_networkLabel) = _name
             }
         }
         spec = _defaults | {
@@ -208,7 +219,7 @@ _nats = [
     ec2v1beta1.NATGateway{
         metadata = _metadata("nat-" + az) | {
             labels = {
-                zone = az, "{}".format(_networkIdTag) = _id
+                zone = az, "{}".format(_networkLabel) = _name
             }
         }
         spec = _defaults | {
@@ -236,7 +247,7 @@ _publicRT = [
     ec2v1beta1.RouteTable{
         metadata = _metadata("rt-public") | {
             labels = {
-                tier = "public", "{}".format(_networkIdTag) = _id
+                tier = "public", "{}".format(_networkLabel) = _name
             }
         }
         spec = _defaults | {
@@ -269,7 +280,7 @@ _privateRTs = [
         metadata = _metadata("rt-private-" + s.az) | {
             labels = {
                 tier = "private", zone = s.az, 
-                "{}".format(_networkIdTag) = _id
+                "{}".format(_networkLabel) = _name
             }
         }
         spec = _defaults | {
@@ -339,7 +350,7 @@ _sg = [
         spec = _defaults | {
             forProvider = {
                 name = oxr.metadata.name + "-default"
-                description = "Default security group for network " + _id
+                description = "Default security group for network " + _name
                 vpcIdSelector.matchControllerRef = True
                 region = _region
                 tags = _baseTags
@@ -365,24 +376,38 @@ _sgRules = [
     }
 ] if _secPolicy == "permissive" else []
 
+# -----------------------------------------------------------------------------
+# zone-structured status — the inter-domain contract. Sibling composites
+# consume AZ-aligned placement data directly; no positional coupling.
+# -----------------------------------------------------------------------------
+_zones = [
+    {
+        name = az
+        _pub = _observedId("subnet-public-" + az)
+        _priv = _observedId("subnet-private-" + az)
+        _nat = _observedId("nat-" + az)
+        if _pub:
+            publicSubnetId = _pub
+        if _priv:
+            privateSubnetId = _priv
+        if _nat:
+            natGatewayId = _nat
+    } for az in _azs
+]
+
 # Status: the stable inter-domain contract (field names outlive providers)
 _status = [
     platformawsv1alpha1.Network{
         status = {
             if _vpcId:
                 networkId = _vpcId
-            subnetIds = [s.id for s in _createdSubnets]
-            publicSubnetIds = [s.id for s in _createdSubnets if s.tier == "public"]
-            privateSubnetIds = [s.id for s in _createdSubnets if s.tier == "private"]
-            securityGroupIds = [_sgId]
-            availabilityZoneNames = _azs
+            if _sgId:
+                securityGroupId = _sgId
             cidrBlock = _cidr
+            zones = [{k: v for k, v in z if not k.startswith("_")} for z in _zones]
         }
         spec = {
-            parameters = {
-                id = _id
-                region = _region
-            }
+            parameters.region = _region
         }
     }
 ]

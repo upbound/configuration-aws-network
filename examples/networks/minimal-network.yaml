@@ -5,5 +5,4 @@ metadata:
   name: app-network
 spec:
   parameters:
-    id: app-network
     region: us-west-2
