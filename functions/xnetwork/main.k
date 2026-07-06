@@ -4,7 +4,7 @@ import models.io.upbound.platform.aws.v1alpha1 as platformawsv1alpha1
 
 import regex
 
-oxr = platformawsv1alpha1.XNetwork{**option("params").oxr}
+oxr = option("params").oxr
 _ocds = option("params").ocds
 _dxr = option("params").dxr
 dcds = option("params").dcds
