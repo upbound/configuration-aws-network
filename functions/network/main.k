@@ -35,6 +35,7 @@ _userTags = params.tags or {}
 _reclaimPolicy = params.reclaimPolicy or "Delete"
 _providerConfigName = params.overrides?.providerConfigName or "default"
 _azOverride = params.overrides?.availabilityZoneNames or []
+_cidrOverride = params.overrides?.subnetCidrs or {}
 
 _networkLabel = "networks.network.platform.upbound.io/network"
 
@@ -92,11 +93,35 @@ _privatePrefix = _parentPrefix + 3
 _publicSlotSize = 2 ** (32 - _publicPrefix)
 _privateSlotSize = 2 ** (32 - _privatePrefix)
 
+# Containment guard: every override CIDR must sit within the parent block.
+# Overlap between subnets is left to the cloud API, which rejects it
+# authoritatively. With no overrides, _flatOverrides is empty and the assert
+# is vacuously true, so the computed path is unaffected.
+_parentSize = 2 ** (32 - _parentPrefix)
+_within = lambda cidr: str -> bool {
+    _b = _ipToInt(cidr.split("/")[0])
+    _p = int(cidr.split("/")[1])
+    _b >= _parentBase and _b + 2 ** (32 - _p) <= _parentBase + _parentSize and _p >= _parentPrefix
+}
+# iterating a tier object yields unset optionals as Undefined — filter them
+_flatOverrides = [c for _az, _tiers in _cidrOverride for _t, c in _tiers if c]
+assert all c in _flatOverrides {
+    _within(c)
+}, "overrides.subnetCidrs entries must fall within cidrBlock " + _cidr
+
 _publicCidr = lambda i: int -> str {
     "{}/{}".format(_intToIp(_parentBase + i * _publicSlotSize), _publicPrefix)
 }
 _privateCidr = lambda i: int -> str {
     "{}/{}".format(_intToIp(_parentBase + (1 + i) * _privateSlotSize), _privatePrefix)
+}
+
+# Per-slot CIDR resolution: an explicit override for this (az, tier) slot wins;
+# otherwise fall back to the computed reserved slot. This is the ONLY place the
+# escape hatch is consulted — _plan's shape is unchanged, so all downstream
+# resources and the status contract are unaffected.
+_slotCidr = lambda az: str, tier: str, computed: str -> str {
+    _cidrOverride?[az]?[tier] or computed
 }
 
 _hasPublic = _strategy in ["public-private", "public-only"]
@@ -106,14 +131,14 @@ _plan = [
     {
         tier = "public"
         az = _azs[i]
-        cidr = _publicCidr(i)
+        cidr = _slotCidr(_azs[i], "public", _publicCidr(i))
         name = "subnet-public-" + _azs[i]
     } for i in range(_azCount) if _hasPublic
 ] + [
     {
         tier = "private"
         az = _azs[i]
-        cidr = _privateCidr(i)
+        cidr = _slotCidr(_azs[i], "private", _privateCidr(i))
         name = "subnet-private-" + _azs[i]
     } for i in range(_azCount) if _hasPrivate
 ]

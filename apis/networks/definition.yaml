@@ -118,6 +118,50 @@ spec:
                             region+suffix list (for regions with non-contiguous
                             AZ lettering or capacity constraints). Length must
                             equal availabilityZones.
+                        subnetCidrs:
+                          type: object
+                          additionalProperties:
+                            type: object
+                            properties:
+                              public:
+                                type: string
+                                description: >-
+                                  Explicit CIDR for this zone's public subnet,
+                                  replacing the computed reserved slot. Must fall
+                                  within cidrBlock; the composition asserts
+                                  containment and the cloud API validates the
+                                  address format.
+                              private:
+                                type: string
+                                description: >-
+                                  Explicit CIDR for this zone's private subnet,
+                                  replacing the computed reserved slot. Must fall
+                                  within cidrBlock; the composition asserts
+                                  containment and the cloud API validates the
+                                  address format.
+                          description: >-
+                            Per-slot subnet CIDR override, keyed by availability
+                            zone name (the same names that appear in
+                            status.zones[].name — either the derived
+                            region+suffix values or
+                            overrides.availabilityZoneNames). Each key carries an
+                            optional public and/or private CIDR that replaces the
+                            reserved-slot address for that one (zone, tier)
+                            subnet; any slot left unset keeps its computed
+                            reserved-slot CIDR, so this is a partial, per-slot
+                            override rather than an all-or-nothing replacement.
+                            The escape hatch exists for brownfield adoption
+                            (matching CIDRs of existing subnets), bespoke sizing,
+                            and organizational IPAM conventions. It changes ONLY
+                            the address of each subnet; the "exactly one public
+                            and one private subnet per active AZ" structure,
+                            resource naming, NAT placement, route tables, and the
+                            AZ-structured status contract are unchanged. Overrides
+                            for zones or tiers not activated by availabilityZones
+                            / subnetStrategy are ignored. Each CIDR must fall
+                            within cidrBlock; the composition does not check for
+                            overlap between subnets — the cloud API rejects
+                            overlapping ranges authoritatively.
                         providerConfigName:
                           type: string
                           description: >-
