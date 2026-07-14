@@ -14,8 +14,8 @@ new AWS features, layout tweaks) without breaking the API your consumers depend 
 
 | Path | Role |
 | --- | --- |
-| [`apis/networks/definition.yaml`](/apis/networks/definition.yaml) | The **contract** — the `Network` XRD (`aws.platform.upbound.io/v1alpha1`, Crossplane v2 `Namespaced` scope). |
-| [`apis/networks/composition.yaml`](/apis/networks/composition.yaml) | The **implementation** — a Pipeline composition delegating to the embedded function. |
+| [`apis/networks/definition.yaml`](/apis/networks/definition.yaml) | The **contract** the `Network` XRD (`aws.platform.upbound.io/v1alpha1`, Crossplane v2 `Namespaced` scope). |
+| [`apis/networks/composition.yaml`](/apis/networks/composition.yaml) | The **implementation** a Pipeline composition delegating to the embedded function. |
 | [`functions/network/main.k`](/functions/network/main.k) | The composition logic (KCL), the only place provider resources and CIDR math appear. |
 | [`apis/networks/mrap.yaml`](/apis/networks/mrap.yaml) | `ManagedResourceActivationPolicy` activating only the CRDs this configuration needs. |
 | [`examples/networks`](/examples/networks) | Ready-to-apply `Network` resources. |
@@ -26,7 +26,7 @@ Dependencies: `provider-aws-ec2` (v2) and `function-auto-ready`.
 ## The Network API
 
 The API is **intent-based**: you express what varies for your network, and nothing
-about how it is built. The only required parameter is `region` — a complete
+about how it is built. The only required parameter is `region`, a complete
 network is a single field:
 
 ```yaml
@@ -44,7 +44,7 @@ spec:
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `region` | string | — (required) | Cloud region, e.g. `us-west-2`. |
+| `region` | string | (required) | Cloud region, e.g. `us-west-2`. |
 | `availabilityZones` | integer (1–6) | `3` | Number of AZs to span. Subnets come from fixed, pre-reserved slots, so increasing this adds subnets without resizing or replacing existing ones. |
 | `cidrBlock` | string | `10.0.0.0/16` | Address space for the network (use `/22` or larger). Slots are allocated at fixed offsets, so growth is always additive. |
 | `subnetStrategy` | enum: `public-private`, `private-only`, `public-only` | `public-private` | Which subnet tiers to activate. Tier offsets are fixed, so changing strategy later activates a reserved tier without touching existing subnets. |
@@ -55,7 +55,7 @@ spec:
 | `tags` | map[string]string | `{}` | Merged into every resource the network creates. |
 | `reclaimPolicy` | enum: `Delete`, `Retain` | `Delete` | Outcome intent using Kubernetes PersistentVolume vocabulary. `Retain` leaves cloud resources in place when the composite is deleted (production networks). |
 | `overrides.availabilityZoneNames` | []string | derived | Explicit AZ names, overriding the derived `region`+suffix list. Length must equal `availabilityZones`. |
-| `overrides.subnetCidrs` | map (see below) | derived | Per-slot subnet CIDR override. Escape hatch for brownfield adoption and bespoke sizing. |
+| `overrides.subnetCidrs` | map (see below) | derived | Per-slot subnet CIDR override. |
 | `overrides.providerConfigName` | string | `default` | Crossplane `ProviderConfig` for account/credential selection. |
 
 ### How subnets are allocated
@@ -66,7 +66,7 @@ carves fixed-size, pre-reserved slots:
 - **Public** subnets are `/(P+6)` (a `/22` for a `/16`), placed low in the range.
 - **Private** subnets are `/(P+3)` (a `/19` for a `/16`), placed above them.
 - One subnet of each active tier per AZ. Offsets are constants of the parent
-  block — independent of AZ count and strategy — so adding an AZ or switching
+  block, independent of AZ count and strategy. Adding an AZ or switching
   strategy only *adds* subnets from reserved slots and never renumbers existing
   ones.
 
@@ -80,8 +80,7 @@ For the default `10.0.0.0/16` across three AZs:
 
 ### Manual CIDR overrides (escape hatch)
 
-When you must control the addresses — matching an existing VPC for brownfield
-adoption, bespoke sizing, or an organizational IPAM plan — set
+When you must control the addresses for bespoke sizing or an organizational IPAM plan, set
 `overrides.subnetCidrs`. It is a **map keyed by AZ name** (the same names that
 appear in `status.zones[].name`), each with an optional `public` and/or `private`
 CIDR:
@@ -103,13 +102,13 @@ spec:
 
 The override is **per-slot and partial**: each `(AZ, tier)` you specify takes your
 explicit CIDR; every slot you leave out keeps its computed reserved-slot address.
-It changes only the *address* of a subnet — the one-public-and-one-private-per-AZ
+It changes only the *address* of a subnet, the one-public-and-one-private-per-AZ
 structure, resource naming, NAT placement, route tables, and the status contract
 are all unchanged.
 
 Each override CIDR must fall within `cidrBlock` (the composition asserts this and
 fails fast with a clear message). Overlap and alignment between subnets are **not**
-checked in the composition — AWS rejects overlapping or misaligned ranges
+checked in the composition. AWS rejects overlapping or misaligned ranges
 authoritatively at apply time, so a bad set surfaces as a subnet
 `InvalidSubnet.Conflict` on the managed resource.
 
