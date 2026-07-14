@@ -1,0 +1,8 @@
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: Network
+metadata:
+  namespace: default
+  name: app-network
+spec:
+  parameters:
+    region: us-west-2

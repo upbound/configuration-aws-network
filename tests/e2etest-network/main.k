@@ -27,36 +27,18 @@ _items = [
             manifests: [
                 platformawsv1alpha1.Network{
                     metadata = {
-                        name = "configuration-aws-network"
+                        name = "app-network"
                         namespace = "default"
                     }
                     spec = {
                         parameters = {
-                            id = "configuration-aws-network"
                             region = "us-west-2"
-                            vpcCidrBlock = "192.168.0.0/16"
-                            subnets = [
-                                {
-                                    availabilityZone = "us-west-2a"
-                                    $type = "public"
-                                    cidrBlock = "192.168.0.0/18"
-                                }
-                                {
-                                    availabilityZone = "us-west-2b"
-                                    $type = "public"
-                                    cidrBlock = "192.168.64.0/18"
-                                }
-                                {
-                                    availabilityZone = "us-west-2a"
-                                    $type = "private"
-                                    cidrBlock = "192.168.128.0/18"
-                                }
-                                {
-                                    availabilityZone = "us-west-2b"
-                                    $type = "private"
-                                    cidrBlock = "192.168.192.0/18"
-                                }
-                            ]
+                            availabilityZones = 3
+                            cidrBlock = "10.0.0.0/16"
+                            subnetStrategy = "public-private"
+                            natGateway = "single"
+                            defaultSecurityPolicy = "restrictive"
+                            reclaimPolicy = "Delete"
                         }
                     }
                 }

@@ -1,0 +1,17 @@
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: Network
+metadata:
+  namespace: platform-infra
+  name: production-network
+spec:
+  parameters:
+    region: us-west-2
+    availabilityZones: 3
+    cidrBlock: "10.0.0.0/16"
+    subnetStrategy: public-private
+    natGateway: per-az
+    defaultSecurityPolicy: restrictive
+    reclaimPolicy: Retain
+    tags:
+      environment: production
+      cost-center: infrastructure

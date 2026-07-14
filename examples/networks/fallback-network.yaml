@@ -1,0 +1,17 @@
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: Network
+metadata:
+  namespace: default
+  name: fallback-network
+spec:
+  parameters:
+    region: us-west-2
+    cidrBlock: "10.0.0.0/16"
+    subnetStrategy: public-private
+    natGateway: single
+    overrides:
+      subnetCidrs:
+        us-west-2a:
+          public: "10.0.0.0/24"   # override only this one slot
+          # us-west-2a private omitted -> computed reserved slot (10.0.32.0/19)
+        # us-west-2b and us-west-2c omitted -> fully computed

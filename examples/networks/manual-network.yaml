@@ -1,0 +1,21 @@
+apiVersion: aws.platform.upbound.io/v1alpha1
+kind: Network
+metadata:
+  namespace: default
+  name: manual-network
+spec:
+  parameters:
+    region: us-west-2
+    availabilityZones: 2
+    cidrBlock: "10.0.0.0/16"
+    subnetStrategy: public-private
+    natGateway: single
+    overrides:
+      subnetCidrs:
+        us-west-2a:
+          public: "10.0.0.0/24"      # override (matches an existing subnet)
+          private: "10.0.10.0/23"    # override
+        us-west-2b:
+          private: "10.0.20.0/23"    # override
+          public: "10.0.30.0/23"      # override
+        # us-west-2c omitted entirely -> both slots computed

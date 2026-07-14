@@ -2,6 +2,9 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   name: networks.aws.platform.upbound.io
+  labels:
+    platform.upbound.io/layer: l3
+    platform.upbound.io/provider-family: upbound-aws
 spec:
   compositeTypeRef:
     apiVersion: aws.platform.upbound.io/v1alpha1

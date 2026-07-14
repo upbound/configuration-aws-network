@@ -21,94 +21,183 @@ spec:
               properties:
                 parameters:
                   description: Network Parameters
+                  type: object
                   properties:
-                    id:
-                      type: string
-                      description: ID of this Network that other objects will use to refer to it.
                     region:
                       type: string
-                      description: Region is the region you'd like your resource to be created in.
-                    managementPolicies:
-                      description: ManagementPolicies for AWS EC2 resources. Defaults to ["*"] which includes all operations (Create, Observe, Update, Delete, LateInitialize). To orphan resources on deletion, use ["Create", "Observe", "Update", "LateInitialize"].
-                      type: array
-                      items:
+                      description: Cloud region, e.g. us-west-2.
+                    availabilityZones:
+                      type: integer
+                      minimum: 1
+                      maximum: 6
+                      default: 3
+                      description: >-
+                        Number of AZs to span. Subnets are allocated from
+                        fixed, pre-reserved slots, so increasing this value
+                        adds subnets without resizing or replacing existing
+                        ones.
+                    cidrBlock:
+                      type: string
+                      pattern: '^([0-9]{1,3}\.){3}[0-9]{1,3}/([0-9]|1[0-9]|2[0-2])$'
+                      default: "10.0.0.0/16"
+                      description: >-
+                        Address space for the network (prefix /22 or larger so
+                        per-AZ slots remain usable). The composition allocates
+                        fixed-size slots: small public subnets (parent+6 bits)
+                        low in the range, large private subnets (parent+3 bits)
+                        above them, with reserved space for future AZs and
+                        future tiers. Allocation offsets never depend on AZ
+                        count or strategy — growth is always additive.
+                    subnetStrategy:
+                      type: string
+                      enum: [public-private, private-only, public-only]
+                      default: public-private
+                      description: >-
+                        Which tiers to activate. Tier offsets are fixed, so
+                        later changing strategy activates the new tier's
+                        reserved slots without touching existing subnets.
+                    natGateway:
+                      type: string
+                      enum: [per-az, single, none]
+                      default: single
+                      description: >-
+                        Egress strategy for private subnets. per-az gives each
+                        zone an independent egress path (losing one AZ does not
+                        impair the others — static stability as a consumer
+                        choice); single trades that for cost; none means no
+                        internet egress (pair with VPC endpoints). Ignored for
+                        public-only.
+                    dnsSupport:
+                      type: boolean
+                      default: true
+                    dnsHostnames:
+                      type: boolean
+                      default: true
+                    defaultSecurityPolicy:
+                      type: string
+                      enum: [restrictive, permissive]
+                      default: restrictive
+                      description: >-
+                        restrictive creates the network security group with no
+                        ingress rules — workloads bring their own. permissive
+                        allows all traffic originating within the network CIDR
+                        (development convenience). The network layer defines NO
+                        service-specific rules; database/app access is requested
+                        by those domains against this network's contract.
+                    tags:
+                      type: object
+                      additionalProperties:
                         type: string
-                        enum:
-                          - "*"
-                          - Create
-                          - Observe
-                          - Update
-                          - Delete
-                          - LateInitialize
-                      default: ["*"]
-                    providerConfigName:
-                      description: Crossplane ProviderConfig to use for provisioning this resources
+                      description: Merged into every resource this network creates.
+                    reclaimPolicy:
                       type: string
-                      default: default
-                    vpcCidrBlock:
-                      type: string
-                      description: CIDR block for the VPC
-                      default: 192.168.0.0/16
-                    subnets:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          availabilityZone:
+                      enum: [Delete, Retain]
+                      default: Delete
+                      description: >-
+                        Outcome intent, using the Kubernetes PersistentVolume
+                        vocabulary. Retain leaves cloud resources in place when
+                        this composite is deleted (production networks). The
+                        mapping to Crossplane management policies is an
+                        implementation detail owned by the composition — the
+                        field deliberately does NOT echo any Crossplane
+                        machinery, past or present.
+                    overrides:
+                      type: object
+                      description: >-
+                        Bounded escape hatch with an explicit support boundary.
+                        Exists so operational edge cases have a sanctioned
+                        outlet instead of forcing leaks into the primary
+                        contract.
+                      properties:
+                        availabilityZoneNames:
+                          type: array
+                          items:
                             type: string
-                          type:
-                            type: string
-                            enum:
-                              - public
-                              - private
-                          cidrBlock:
-                            type: string
-                      description: Subnets to create in the VPC
-                      required:
-                        - availabilityZone
-                        - type
-                        - cidrBlock
-                      default:
-                        - availabilityZone: us-west-2a
-                          type: public
-                          cidrBlock: 192.168.0.0/18
-                        - availabilityZone: us-west-2b
-                          type: public
-                          cidrBlock: 192.168.64.0/18
-                        - availabilityZone: us-west-2a
-                          type: private
-                          cidrBlock: 192.168.128.0/18
-                        - availabilityZone: us-west-2b
-                          type: private
-                          cidrBlock: 192.168.192.0/18
+                          description: >-
+                            Explicit AZ names, overriding the derived
+                            region+suffix list (for regions with non-contiguous
+                            AZ lettering or capacity constraints). Length must
+                            equal availabilityZones.
+                        subnetCidrs:
+                          type: object
+                          additionalProperties:
+                            type: object
+                            properties:
+                              public:
+                                type: string
+                                description: >-
+                                  Explicit CIDR for this zone's public subnet,
+                                  replacing the computed reserved slot. Must fall
+                                  within cidrBlock; the composition asserts
+                                  containment and the cloud API validates the
+                                  address format.
+                              private:
+                                type: string
+                                description: >-
+                                  Explicit CIDR for this zone's private subnet,
+                                  replacing the computed reserved slot. Must fall
+                                  within cidrBlock; the composition asserts
+                                  containment and the cloud API validates the
+                                  address format.
+                          description: >-
+                            Per-slot subnet CIDR override, keyed by availability
+                            zone name (the same names that appear in
+                            status.zones[].name — either the derived
+                            region+suffix values or
+                            overrides.availabilityZoneNames). Each key carries an
+                            optional public and/or private CIDR that replaces the
+                            reserved-slot address for that one (zone, tier)
+                            subnet; any slot left unset keeps its computed
+                            reserved-slot CIDR, so this is a partial, per-slot
+                            override rather than an all-or-nothing replacement.
+                            The escape hatch exists for brownfield adoption
+                            (matching CIDRs of existing subnets), bespoke sizing,
+                            and organizational IPAM conventions. It changes ONLY
+                            the address of each subnet; the "exactly one public
+                            and one private subnet per active AZ" structure,
+                            resource naming, NAT placement, route tables, and the
+                            AZ-structured status contract are unchanged. Overrides
+                            for zones or tiers not activated by availabilityZones
+                            / subnetStrategy are ignored. Each CIDR must fall
+                            within cidrBlock; the composition does not check for
+                            overlap between subnets — the cloud API rejects
+                            overlapping ranges authoritatively.
+                        providerConfigName:
+                          type: string
+                          description: >-
+                            Crossplane ProviderConfig for account/credential
+                            selection. Defaults to "default".
                   required:
-                    - managementPolicies
-                    - providerConfigName
-                    - id
                     - region
-                    - subnets
-                    - vpcCidrBlock
-                  type: object
               required:
                 - parameters
             status:
               type: object
               properties:
-                vpcId:
+                networkId:
                   type: string
-                subnetIds:
+                  description: Cloud network identifier (vpc-...).
+                securityGroupId:
+                  type: string
+                  description: Identifier of the network's default security group.
+                cidrBlock:
+                  type: string
+                zones:
                   type: array
+                  description: >-
+                    The inter-domain contract, structured by availability
+                    zone so sibling composites (Compute, DataStore, Ingress)
+                    consume AZ-aligned placement data directly instead of
+                    re-deriving alignment from array positions.
                   items:
-                    type: string
-                publicSubnetIds:
-                  type: array
-                  items:
-                    type: string
-                privateSubnetIds:
-                  type: array
-                  items:
-                    type: string
-                securityGroupIds:
-                  type: array
-                  items:
-                    type: string
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: AZ name, e.g. us-west-2a.
+                      publicSubnetId:
+                        type: string
+                      privateSubnetId:
+                        type: string
+                      natGatewayId:
+                        type: string
