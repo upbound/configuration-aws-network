@@ -41,6 +41,23 @@ spec:
                           - Delete
                           - LateInitialize
                       default: ["*"]
+                    externalNames:
+                      description: >-
+                        Optional map of composition-resource-name to
+                        crossplane.io/external-name, used to adopt existing AWS
+                        resources instead of creating new ones. AWS assigns the
+                        identifiers of every resource this configuration composes
+                        (vpc-, subnet-, igw-, rtb-, sg-), so a Crossplane control
+                        plane that holds no prior state about them cannot adopt
+                        them by name; it must be told each identifier explicitly.
+                        Keys are the krm.kcl.dev/composition-resource-name values
+                        ("vpc", "igw", "rt", "sg", "route", "mrt",
+                        "subnet-<az>-<cidr>-<type>", "rta-<az>-<cidr>-<type>",
+                        "sgr-postgres", "sgr-mysql"). Resources not listed are
+                        unaffected. Omit this field for normal use.
+                      type: object
+                      additionalProperties:
+                        type: string
                     providerConfigName:
                       description: Crossplane ProviderConfig to use for provisioning this resources
                       type: string

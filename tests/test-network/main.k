@@ -34,6 +34,10 @@ _items = [
                             description = "Allow access to databases"
                             name = "platform-ref-aws-cluster"
                             region = "us-west-2"
+                            tags = {
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "sg"
+                            }
                             vpcIdSelector = {
                                 matchControllerRef = True
                             }
@@ -139,6 +143,8 @@ _items = [
                             tags = {
                                 "kubernetes.io/role/elb" = "1"
                                 "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "subnet-us-west-2a-192-168-0-0-18-public"
                             }
                             vpcIdSelector = {
                                 matchControllerRef = True
@@ -173,6 +179,8 @@ _items = [
                             region = "us-west-2"
                             tags = {
                                 "kubernetes.io/role/internal-elb" = "1"
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "subnet-us-west-2a-192-168-128-0-18-private"
                             }
                             vpcIdSelector = {
                                 matchControllerRef = True
@@ -207,6 +215,8 @@ _items = [
                             region = "us-west-2"
                             tags = {
                                 "kubernetes.io/role/internal-elb" = "1"
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "subnet-us-west-2b-192-168-192-0-18-private"
                             }
                             vpcIdSelector = {
                                 matchControllerRef = True
@@ -243,6 +253,8 @@ _items = [
                             tags = {
                                 "kubernetes.io/role/elb" = "1"
                                 "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "subnet-us-west-2b-192-168-64-0-18-public"
                             }
                             vpcIdSelector = {
                                 matchControllerRef = True
@@ -276,6 +288,8 @@ _items = [
                             region = "us-west-2"
                             tags = {
                                 Name = "configuration-aws-network"
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "vpc"
                             }
                         }
                         managementPolicies = [
@@ -301,6 +315,10 @@ _items = [
                     spec = {
                         forProvider = {
                             region = "us-west-2"
+                            tags = {
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "igw"
+                            }
                             vpcIdSelector = {
                                 matchControllerRef = True
                             }
@@ -389,6 +407,10 @@ _items = [
                     spec = {
                         forProvider = {
                             region = "us-west-2"
+                            tags = {
+                                "upbound.io/ctp-id" = "configuration-aws-network"
+                                "upbound.io/ctp-resource" = "rt"
+                            }
                             vpcIdSelector = {
                                 matchControllerRef = True
                             }
@@ -541,6 +563,53 @@ _items = [
             ]
             compositionPath: "apis/networks/composition.yaml"
             xrPath: "examples/networks/configuration-aws-network.yaml"
+            xrdPath: "apis/networks/definition.yaml"
+            timeoutSeconds: 60
+            validate: False
+        }
+    }
+    metav1alpha1.CompositionTest{
+        metadata.name: "test-network-external-names"
+        spec= {
+            # An injected external-name makes Crossplane observe the existing AWS
+            # object instead of creating a duplicate. AWS assigns VPC and subnet
+            # ids, so a control plane with no prior state has no other way to
+            # adopt them. Unlisted resources are unaffected.
+            xr: platformawsv1alpha1.Network{
+                metadata = {
+                    name = "configuration-aws-network"
+                    namespace = "network-team"
+                }
+                spec.parameters = {
+                    id = "configuration-aws-network"
+                    region = "us-west-2"
+                    externalNames = {
+                        vpc = "vpc-08a368fd767569aed"
+                        igw = "igw-086295b0369e2ab86"
+                    }
+                }
+            }
+            assertResources: [
+                ec2v1beta1.VPC{
+                    metadata = {
+                        annotations = {
+                            "crossplane.io/composition-resource-name" = "vpc"
+                            "crossplane.io/external-name" = "vpc-08a368fd767569aed"
+                        }
+                    }
+                    spec.forProvider.region = "us-west-2"
+                }
+                ec2v1beta1.InternetGateway{
+                    metadata = {
+                        annotations = {
+                            "crossplane.io/composition-resource-name" = "igw"
+                            "crossplane.io/external-name" = "igw-086295b0369e2ab86"
+                        }
+                    }
+                    spec.forProvider.region = "us-west-2"
+                }
+            ]
+            compositionPath: "apis/networks/composition.yaml"
             xrdPath: "apis/networks/definition.yaml"
             timeoutSeconds: 60
             validate: False

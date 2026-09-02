@@ -18,9 +18,35 @@ dcds = option("params").dcds
 
 providerConfigRefName = oxr.spec.parameters.providerConfigName or None
 
+_externalNames = oxr.spec.parameters.externalNames or {}
+
+# Every composed resource routes its annotations through here, so injecting the
+# external-name at this single point covers all of them - including the
+# associations and rules that carry no AWS tags and can only be adopted by an
+# identifier the caller supplies.
 _metadata = lambda name = str -> any {
     {
-        annotations = {"krm.kcl.dev/composition-resource-name" = name}
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = name
+            if name in _externalNames:
+                "crossplane.io/external-name" = _externalNames[name]
+        }
+    }
+}
+
+# Identity tags. AWS assigns most of this configuration's resource identifiers,
+# so a Crossplane control plane holding no prior state cannot find them again by
+# name. These two tags are the only stable key: `ctp-id` says which Network the
+# resource belongs to, `ctp-resource` says which composed resource it is. A
+# consumer discovers them with the Resource Groups Tagging API and feeds the
+# result back through `externalNames` to adopt rather than duplicate.
+#
+# Note provider-upjet-aws already adds a `crossplane-name` tag, but its value is
+# the randomly generated managed-resource name, so it cannot serve this purpose.
+_identityTags = lambda name = str -> any {
+    {
+        "upbound.io/ctp-id" = oxr.spec.parameters.id
+        "upbound.io/ctp-resource" = name
     }
 }
 
@@ -40,6 +66,20 @@ _cidrEscaped = lambda cidr = str -> str {
 _formatSubnet = lambda s = dict -> str {
     "{}-{}-{}".format(s.availabilityZone, _cidrEscaped(s.cidrBlock), s.type)
 }
+
+# Every composition-resource-name this function can emit. The subnet and
+# route-table-association names are derived from spec.parameters.subnets, so the
+# valid set depends on the caller and cannot be enumerated in the XRD schema -
+# which is why externalNames is an open map and is validated here instead.
+_subnetKeys = ["subnet-" + _formatSubnet(s) for s in oxr.spec.parameters.subnets or []]
+_rtaKeys = ["rta-" + _formatSubnet(s) for s in oxr.spec.parameters.subnets or []]
+_externalNameKeys = ["vpc", "igw", "rt", "route", "mrt", "sg", "sgr-postgres", "sgr-mysql"] + _subnetKeys + _rtaKeys
+
+# Fail loudly on an unknown key. Silently ignoring one would leave that resource
+# unadopted and create a duplicate in AWS, the exact failure adoption prevents.
+_unknownExternalNames = [k for k in _externalNames if k not in _externalNameKeys]
+
+assert len(_unknownExternalNames) == 0, "spec.parameters.externalNames has unknown key(s) ${_unknownExternalNames}; valid keys for this Network are ${_externalNameKeys}"
 
 _getExternalName = lambda resourceName = str -> str {
     id = option("params")?.ocds?[resourceName]?.Resource?.metadata?.annotations?["crossplane.io/external-name"] or None
@@ -77,7 +117,7 @@ _items = [
                 cidrBlock = oxr.spec.parameters.vpcCidrBlock
                 enableDnsHostnames = True
                 enableDnsSupport = True
-                tags = {
+                tags = _identityTags("vpc") | {
                     Name = oxr.metadata.name
                 }
                 region = oxr.spec.parameters.region
@@ -96,6 +136,7 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
+                tags = _identityTags("igw")
                 region = oxr.spec.parameters.region
             }
         }
@@ -117,7 +158,7 @@ _items = [
                 cidrBlock = s.cidrBlock
                 if s.type == "public":
                     mapPublicIpOnLaunch = True
-                tags = {
+                tags = _identityTags("subnet-" + _formatSubnet(s)) | {
                     if s.type == "private":
                         "kubernetes.io/role/internal-elb" = "1"
                     else:
@@ -170,6 +211,7 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
+                tags = _identityTags("rt")
                 region = oxr.spec.parameters.region
             }
         }
@@ -227,6 +269,7 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
+                tags = _identityTags("sg")
                 region = oxr.spec.parameters.region
             }
         }
