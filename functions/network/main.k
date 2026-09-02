@@ -24,6 +24,22 @@ _metadata = lambda name = str -> any {
     }
 }
 
+# Identity tags. AWS assigns most of this configuration's resource identifiers,
+# so a Crossplane control plane holding no prior state cannot find them again by
+# name. These two tags are the only stable key: `ctp-id` says which Network the
+# resource belongs to, `ctp-resource` says which composed resource it is. A
+# consumer discovers them with the Resource Groups Tagging API and feeds the
+# result back through `externalNames` to adopt rather than duplicate.
+#
+# Note provider-upjet-aws already adds a `crossplane-name` tag, but its value is
+# the randomly generated managed-resource name, so it cannot serve this purpose.
+_identityTags = lambda name = str -> any {
+    {
+        "upbound.io/ctp-id" = oxr.spec.parameters.id
+        "upbound.io/ctp-resource" = name
+    }
+}
+
 _defaults = {
     managementPolicies = option("params")?.oxr?.spec.parameters.managementPolicies or ["*"]
     if providerConfigRefName:
@@ -77,7 +93,7 @@ _items = [
                 cidrBlock = oxr.spec.parameters.vpcCidrBlock
                 enableDnsHostnames = True
                 enableDnsSupport = True
-                tags = {
+                tags = _identityTags("vpc") | {
                     Name = oxr.metadata.name
                 }
                 region = oxr.spec.parameters.region
@@ -96,6 +112,7 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
+                tags = _identityTags("igw")
                 region = oxr.spec.parameters.region
             }
         }
@@ -117,7 +134,7 @@ _items = [
                 cidrBlock = s.cidrBlock
                 if s.type == "public":
                     mapPublicIpOnLaunch = True
-                tags = {
+                tags = _identityTags("subnet-" + _formatSubnet(s)) | {
                     if s.type == "private":
                         "kubernetes.io/role/internal-elb" = "1"
                     else:
@@ -170,6 +187,7 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
+                tags = _identityTags("rt")
                 region = oxr.spec.parameters.region
             }
         }
@@ -227,6 +245,7 @@ _items = [
                 vpcIdSelector = {
                     matchControllerRef = True
                 }
+                tags = _identityTags("sg")
                 region = oxr.spec.parameters.region
             }
         }
