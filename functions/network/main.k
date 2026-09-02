@@ -4,7 +4,14 @@ import models.io.upbound.platform.aws.v1alpha1 as platformawsv1alpha1
 
 import regex
 
-oxr = platformawsv1alpha1.Network{**option("params").oxr}
+_oxrRaw = option("params").oxr
+
+# spec.crossplane is Crossplane-owned machinery this function never reads, and the
+# renderer writes resourceRefs[].namespace, which the XRD-derived model omits.
+oxr = platformawsv1alpha1.Network{
+    **_oxrRaw
+    spec = {k: v for k, v in _oxrRaw.spec if k != "crossplane"}
+}
 _ocds = option("params").ocds
 _dxr = option("params").dxr
 dcds = option("params").dcds

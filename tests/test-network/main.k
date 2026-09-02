@@ -28,16 +28,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -67,16 +57,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -112,16 +92,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -159,16 +129,6 @@ _items = [
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                             zone = "us-west-2a"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -205,16 +165,6 @@ _items = [
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                             zone = "us-west-2a"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -249,16 +199,6 @@ _items = [
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                             zone = "us-west-2b"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -293,16 +233,6 @@ _items = [
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                             zone = "us-west-2b"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -337,16 +267,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -377,16 +297,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -414,16 +324,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -454,16 +354,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -495,16 +385,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -532,16 +412,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -576,16 +446,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -620,16 +480,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
@@ -664,16 +514,6 @@ _items = [
                             "crossplane.io/composite" = "configuration-aws-network"
                             "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
                         }
-                        ownerReferences = [
-                            {
-                                apiVersion = "aws.platform.upbound.io/v1alpha1"
-                                blockOwnerDeletion = True
-                                controller = True
-                                kind = "Network"
-                                name = "configuration-aws-network"
-                                uid = ""
-                            }
-                        ]
                     }
                     spec = {
                         forProvider = {
