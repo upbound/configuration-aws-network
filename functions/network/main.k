@@ -67,6 +67,20 @@ _formatSubnet = lambda s = dict -> str {
     "{}-{}-{}".format(s.availabilityZone, _cidrEscaped(s.cidrBlock), s.type)
 }
 
+# Every composition-resource-name this function can emit. The subnet and
+# route-table-association names are derived from spec.parameters.subnets, so the
+# valid set depends on the caller and cannot be enumerated in the XRD schema -
+# which is why externalNames is an open map and is validated here instead.
+_subnetKeys = ["subnet-" + _formatSubnet(s) for s in oxr.spec.parameters.subnets or []]
+_rtaKeys = ["rta-" + _formatSubnet(s) for s in oxr.spec.parameters.subnets or []]
+_externalNameKeys = ["vpc", "igw", "rt", "route", "mrt", "sg", "sgr-postgres", "sgr-mysql"] + _subnetKeys + _rtaKeys
+
+# Fail loudly on an unknown key. Silently ignoring one would leave that resource
+# unadopted and create a duplicate in AWS, the exact failure adoption prevents.
+_unknownExternalNames = [k for k in _externalNames if k not in _externalNameKeys]
+
+assert len(_unknownExternalNames) == 0, "spec.parameters.externalNames has unknown key(s) ${_unknownExternalNames}; valid keys for this Network are ${_externalNameKeys}"
+
 _getExternalName = lambda resourceName = str -> str {
     id = option("params")?.ocds?[resourceName]?.Resource?.metadata?.annotations?["crossplane.io/external-name"] or None
 }
