@@ -18,9 +18,19 @@ dcds = option("params").dcds
 
 providerConfigRefName = oxr.spec.parameters.providerConfigName or None
 
+_externalNames = oxr.spec.parameters.externalNames or {}
+
+# Every composed resource routes its annotations through here, so injecting the
+# external-name at this single point covers all of them - including the
+# associations and rules that carry no AWS tags and can only be adopted by an
+# identifier the caller supplies.
 _metadata = lambda name = str -> any {
     {
-        annotations = {"krm.kcl.dev/composition-resource-name" = name}
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = name
+            if name in _externalNames:
+                "crossplane.io/external-name" = _externalNames[name]
+        }
     }
 }
 
