@@ -51,7 +51,7 @@ spec:
                         plane that holds no prior state about them cannot adopt
                         them by name; it must be told each identifier explicitly.
                         Keys are the krm.kcl.dev/composition-resource-name values
-                        ("vpc", "igw", "rt", "sg", "route", "mrt",
+                        ("vpc", "igw", "rt", "sg", "route",
                         "subnet-<az>-<cidr>-<type>", "rta-<az>-<cidr>-<type>",
                         "sgr-postgres", "sgr-mysql"). Resources not listed are
                         unaffected. Omit this field for normal use.

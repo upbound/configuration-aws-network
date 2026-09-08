@@ -73,7 +73,7 @@ _formatSubnet = lambda s = dict -> str {
 # which is why externalNames is an open map and is validated here instead.
 _subnetKeys = ["subnet-" + _formatSubnet(s) for s in oxr.spec.parameters.subnets or []]
 _rtaKeys = ["rta-" + _formatSubnet(s) for s in oxr.spec.parameters.subnets or []]
-_externalNameKeys = ["vpc", "igw", "rt", "route", "mrt", "sg", "sgr-postgres", "sgr-mysql"] + _subnetKeys + _rtaKeys
+_externalNameKeys = ["vpc", "igw", "rt", "route", "sg", "sgr-postgres", "sgr-mysql"] + _subnetKeys + _rtaKeys
 
 # Fail loudly on an unknown key. Silently ignoring one would leave that resource
 # unadopted and create a duplicate in AWS, the exact failure adoption prevents.
@@ -237,25 +237,9 @@ _items = [
         }
     }
 ] + [
-    ec2v1beta1.MainRouteTableAssociation{
-        metadata = _metadata("mrt") | {
-            labels = {
-                "networks.aws.platform.upbound.io/network-id" = oxr.spec.parameters.id
-            }
-        }
-        spec = _defaults | {
-            forProvider = {
-                routeTableIdSelector = {
-                    matchControllerRef = True
-                }
-                vpcIdSelector = {
-                    matchControllerRef = True
-                }
-                region = oxr.spec.parameters.region
-            }
-        }
-    }
-] + [
+    # No MainRouteTableAssociation: it added no routing (every subnet above is
+    # associated explicitly) and on re-apply left `rt` as the VPC's main table,
+    # which AWS refuses to disassociate - leaking `rt` and the VPC.
     ec2v1beta1.SecurityGroup{
         metadata = _metadata("sg") | {
             labels = {

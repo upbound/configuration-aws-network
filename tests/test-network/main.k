@@ -332,36 +332,6 @@ _items = [
                         }
                     }
                 }
-                ec2v1beta1.MainRouteTableAssociation{
-                    metadata = {
-                        annotations = {
-                            "crossplane.io/composition-resource-name" = "mrt"
-                        }
-                        generateName = "configuration-aws-network-"
-                        labels = {
-                            "crossplane.io/composite" = "configuration-aws-network"
-                            "networks.aws.platform.upbound.io/network-id" = "configuration-aws-network"
-                        }
-                    }
-                    spec = {
-                        forProvider = {
-                            region = "us-west-2"
-                            routeTableIdSelector = {
-                                matchControllerRef = True
-                            }
-                            vpcIdSelector = {
-                                matchControllerRef = True
-                            }
-                        }
-                        managementPolicies = [
-                            "*"
-                        ]
-                        providerConfigRef = {
-                            kind = "ProviderConfig"
-                            name = "default"
-                        }
-                    }
-                }
                 ec2v1beta1.Route{
                     metadata = {
                         annotations = {
